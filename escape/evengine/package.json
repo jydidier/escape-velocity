@@ -1,0 +1,24 @@
+{
+  "name": "escape-velocity",
+  "version": "0.1.0",
+  "description": "This is an attempt to clone the Terminal Velocity engine inside a web browser",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "game",
+    "engine",
+    "browser"
+  ],
+  "author": "Jean-Yves Didier",
+  "license": "GPL",
+  "devDependencies": {
+    "bower": ">=1.3.9",
+    "grunt": ">=0.4.5",
+    "grunt-jslint": ">=1.1.12",
+    "grunt-contrib-uglify": ">=0.5.1",
+    "grunt-jsdoc": ">=0.5.6",
+    "grunt-bower-task": ">=0.4.0",
+    "grunt-contrib-concat": ">=0.5.0"
+  }
+}

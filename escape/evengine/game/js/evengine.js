@@ -1,4 +1,3 @@
-
 // Sending and Receiving Binary Data
 //   https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
 
@@ -42,7 +41,6 @@ var FileLoader = function() {
 
 }    
 //     var byteArray = new Uint8Array(arrayBuffer);
-
 
 
 var Level = function(groundData) {
@@ -91,6 +89,7 @@ var Level = function(groundData) {
     buildSceneGraph();    
 }
 
+
 function RenderManager() {
     var renderer = new THREE.WebGLRenderer();
     var scene;
@@ -123,7 +122,6 @@ function RenderManager() {
     window.onresize =  resize;
     document.body.appendChild(renderer.domElement);     
 }
-
 
 
 function main() {
