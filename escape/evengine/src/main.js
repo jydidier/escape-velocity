@@ -3,13 +3,20 @@
 function main() {
     var fileLoader = new FileLoader();
     var renderManager = new RenderManager();
+    var level = new Level(fileLoader);
     
-    fileLoader.loadData('data/TERRAN.RAW').then(
+    fileLoader.loadJSON('data/terran.json').then(
         function() {
-            var level = new Level(fileLoader.getData('data/TERRAN.RAW'));
-            renderManager.setScene(level.getScene());
+            return level.init(fileLoader.getData('data/terran.json'));
+        }
+    ).then( 
+        function() {
+            level.player.setCamera(renderManager.getCamera());
             
-            renderManager.render();
+            level.buildSceneGraph();
+            renderManager.setScene(level.getScene());
+            renderManager.setPlayer(level.player);
+            renderManager.animate();                
         }
     );
 }

@@ -3,6 +3,7 @@
 
 var FileLoader = function() {
     var files = {};
+
     
     this.getData = function (file) {
         return files[file];
@@ -31,6 +32,23 @@ var FileLoader = function() {
         });
     };
     
+    this.loadTexture = function(fileUrl) {
+        return new Promise(function (resolve, reject) {
+            var loader = new THREE.TextureLoader();
+            loader.load(
+                fileUrl,
+                function(texture) {
+                    files[fileUrl] = texture;
+                    resolve(texture);
+                },
+                function(xhr) {},
+                function(xhr) {
+                    reject('Texture not downloaded ' + fileUrl);
+                }
+            );
+        });
+    };
+
     this.loadJSON = function(fileUrl) {
         return load('json', fileUrl);
     };
@@ -38,6 +56,7 @@ var FileLoader = function() {
     this.loadData = function(fileUrl) {
         return load('arraybuffer', fileUrl);
     };
+    
 
 }    
 //     var byteArray = new Uint8Array(arrayBuffer);

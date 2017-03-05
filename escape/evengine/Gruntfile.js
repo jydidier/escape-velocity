@@ -76,6 +76,7 @@ module.exports = function (grunt) {
             dist: {
                 src: [
                     'src/fileloader.js',
+                    'src/player.js',
                     'src/level.js',
                     'src/rendermanager.js',
                     'src/main.js'
