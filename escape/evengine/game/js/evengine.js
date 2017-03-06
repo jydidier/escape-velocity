@@ -63,7 +63,9 @@ var FileLoader = function() {
 
 var Player = function() {
     var camera;
-    var speed = 0.01;
+    var speed = 0.1;
+    var clock = new THREE.Clock(false);
+    var barrel = 0;
     
     this.setCamera = function (c) {
         camera = c;        
@@ -74,23 +76,37 @@ var Player = function() {
         camera.position.y = y;
         camera.position.z = z;
         camera.rotation.x = roll + Math.PI/2;
-        camera.rotation.y = pitch ;
+        camera.rotation.y = pitch;
         camera.rotation.z = yaw;
     };
     
     this.animate = function() {
-        var goto = camera.getWorldDirection();
-        goto.normalize();
-        goto.multiplyScalar(speed);
-        camera.position.add(goto);
+        if (clock.running === false) {
+            clock.start();
+        } else {
+            var goto = camera.getWorldDirection();
+            goto.normalize();
+            goto.multiplyScalar(speed*clock.getDelta());
+            camera.position.add(goto);
+            
+            if (camera.position.x > 128) { camera.position.x = 128; speed= 0; }
+            if (camera.position.x < -128) { camera.position.x = -128; speed=0; }
+            if (camera.position.y > 128) { camera.position.y = 128; speed = 0; }
+            if (camera.position.y < -128) { camera.position.y = -128; speed = 0;}
+            
+            
+            // we need to stabilize barrel roll
+
+//             camera.rotateOnAxis(new THREE.Vector3(0,0,1), -0.1*barrel);
+//             barrel -= 0.1*barrel;
+//             console.log(barrel);
+//             
+        }
     };
     
     this.handleGroundCollision = function(distance,object,face) {
         if (distance < speed) {
-            // then we have to do something !
-            console.log("bounce!");
-            console.log(face);
-            
+            // then we have to do something !            
             var n = face.normal;
             var dir = new THREE.Vector3();
             var ref = new THREE.Vector3();
@@ -107,57 +123,43 @@ var Player = function() {
             q.premultiply(q0);
             camera.setRotationFromQuaternion(q);
             this.reduceSpeed();
-
-            
-            //var n = new THREE.Triangle(
-            
-            
         }
         
     };
     
     this.increaseSpeed = function() {
-        if (speed < 1) {
-            speed += 0.01;
+        if (speed < 10) {
+            speed += 0.1;
         }
     };
     
     this.reduceSpeed = function() {
         if (speed > 0) {
-           speed -=0.01;
+           speed -=0.1;
         }        
     };
     
     this.lookUp = function() {
-        /*var mat = camera.matrixWorld;
-        var i = new THREE.Vector3();
-        var j = new THREE.Vector3();
-        var k = new THREE.Vector3();
-        mat.extractBasis(i, j, k);
-        
-        camera.rotateOnAxis(i,0.01);*/
-        camera.rotation.x += 0.01;
+        camera.rotateOnAxis(new THREE.Vector3(1,0,0), 0.02);
     };
 
     this.lookDown = function() {
-        /*var mat = camera.matrixWorld;
-        var i = new THREE.Vector3();
-        var j = new THREE.Vector3();
-        var k = new THREE.Vector3();
-        mat.extractBasis(i, j, k);
+        camera.rotateOnAxis(new THREE.Vector3(1,0,0), -0.02);
         
-        camera.rotateOnAxis(i,-0.01);*/
-        camera.rotation.x -= 0.01;
     };
     
     this.lookLeft = function() {
-        var up = camera.up ;
-        camera.rotateOnAxis(up, +0.01);
+        camera.rotateOnAxis(new THREE.Vector3(0,1,0), 0.02);
+        // let's barrel roll a bit !
+         camera.rotateOnAxis(new THREE.Vector3(0,0,1), 0.01);
+//         barrel += 0.02;
     };
     
     this.lookRight = function() {
-        var up = camera.up ;
-        camera.rotateOnAxis(up, -0.01);
+        camera.rotateOnAxis(new THREE.Vector3(0,1,0), -0.02);
+        // let's barrel roll a bit !
+         camera.rotateOnAxis(new THREE.Vector3(0,0,1), -0.01);
+//         barrel -= 0.02;
     };
 
 
@@ -346,37 +348,44 @@ function RenderManager() {
             player.handleGroundCollision(inter.distance,inter.object,inter.face);            
         }
         
-    }
+    };
     
     var keyPress = function(e) {
         //console.log(e);
         
         if (e.keyCode === 38) {
             player.lookUp();
+            return ;
         }
         
         if (e.keyCode === 40) {
             player.lookDown();
+            return ;
         }
         
         if (e.keyCode === 37) {
             player.lookLeft();
+            return ;
         }
         
         if (e.keyCode === 39) {
             player.lookRight();
+            return ;
         }
         
         if (e.key === 'm') {
             document.getElementById('audio').muted = ! document.getElementById('audio').muted;
+            return ;
         }
         
         if (e.key === '+') {
             player.increaseSpeed();
+            return ;
         };
         
         if (e.key === '-') {
             player.reduceSpeed();
+            return ;
         };
             
     };
@@ -402,7 +411,7 @@ function RenderManager() {
         if (gamepad.buttons[1].pressed) {
             player.reduceSpeed();
         }
-    }
+    };
     
     this.setScene = function(s) {
         scene = s;
@@ -425,7 +434,7 @@ function RenderManager() {
         }
         
         requestAnimationFrame(self.animate);
-    }
+    };
 
     var registerGamepad = function(e) {
         gamepad = e.gamepad;

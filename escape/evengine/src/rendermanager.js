@@ -34,37 +34,44 @@ function RenderManager() {
             player.handleGroundCollision(inter.distance,inter.object,inter.face);            
         }
         
-    }
+    };
     
     var keyPress = function(e) {
         //console.log(e);
         
         if (e.keyCode === 38) {
             player.lookUp();
+            return ;
         }
         
         if (e.keyCode === 40) {
             player.lookDown();
+            return ;
         }
         
         if (e.keyCode === 37) {
             player.lookLeft();
+            return ;
         }
         
         if (e.keyCode === 39) {
             player.lookRight();
+            return ;
         }
         
         if (e.key === 'm') {
             document.getElementById('audio').muted = ! document.getElementById('audio').muted;
+            return ;
         }
         
         if (e.key === '+') {
             player.increaseSpeed();
+            return ;
         };
         
         if (e.key === '-') {
             player.reduceSpeed();
+            return ;
         };
             
     };
@@ -90,7 +97,7 @@ function RenderManager() {
         if (gamepad.buttons[1].pressed) {
             player.reduceSpeed();
         }
-    }
+    };
     
     this.setScene = function(s) {
         scene = s;
@@ -113,7 +120,7 @@ function RenderManager() {
         }
         
         requestAnimationFrame(self.animate);
-    }
+    };
 
     var registerGamepad = function(e) {
         gamepad = e.gamepad;
