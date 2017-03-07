@@ -5,10 +5,12 @@ var Level = function(fl) {
     var scene;
     var config;
     var fileLoader = fl;
+    var models = [];
     this.player = new Player();
         
     this.init = function(c) {
         config = c;
+        var i;
         var elem = document.getElementById('audio');
         var source = document.createElement('source');
         source.setAttribute('src',config.musicFile);
@@ -21,6 +23,13 @@ var Level = function(fl) {
             fl.loadData(config.textureMap),
             fl.loadTexture(config.texture)
         ];
+        
+        if (c.models !== undefined) {
+            for(i = 0; i < c.models.length; i++) {
+                p.push(fl.loadData(c.models[i]));
+            }
+        }
+        
         /*return fl.loadData(config.heightMap).then(
                 function() { return fl.loadData(config.textureMap); }
             ).then(
@@ -115,6 +124,18 @@ var Level = function(fl) {
         return bgeom;        
     };
     
+    this.buildObjects = function() {
+        var i;
+        if (config.models === undefined) {
+            return ;
+        }
+        for (i =0; i < config.models.length; i++) {
+            models[i] = new BinModel(fl.getData(config.models[i]));
+        }
+        
+    };
+    
+    
     this.buildSceneGraph = function() {
         var texture = fl.getData(config.texture);
         scene = new THREE.Scene();
@@ -141,6 +162,8 @@ var Level = function(fl) {
             config.navigation[0].yaw,
             config.navigation[0].roll
         );
+        
+        this.buildObjects();
     };
     
     //buildSceneGraph();    

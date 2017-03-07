@@ -89,14 +89,12 @@ var Player = function() {
         camera.rotateOnAxis(new THREE.Vector3(0,1,0), 0.02);
         // let's barrel roll a bit !
          camera.rotateOnAxis(new THREE.Vector3(0,0,1), 0.01);
-//         barrel += 0.02;
     };
     
     this.lookRight = function() {
         camera.rotateOnAxis(new THREE.Vector3(0,1,0), -0.02);
         // let's barrel roll a bit !
-         camera.rotateOnAxis(new THREE.Vector3(0,0,1), -0.01);
-//         barrel -= 0.02;
+        camera.rotateOnAxis(new THREE.Vector3(0,0,1), -0.01);
     };
 
 
