@@ -26,7 +26,8 @@ var Level = function(fl) {
         
         if (c.models !== undefined) {
             for(i = 0; i < c.models.length; i++) {
-                p.push(fl.loadData(c.models[i]));
+                console.log(c.models[i]);
+                p.push(fl.loadData(c.models[i].file));
             }
         }
         
@@ -66,10 +67,10 @@ var Level = function(fl) {
                 
             
             
-            geometry.vertices[i].z += heights[idx]/256;
-            geometry.vertices[i+1].z += heights[idx]/256;
-            geometry.vertices[i+tileSize-1].z += heights[idx]/256;
-            geometry.vertices[i+tileSize].z += heights[idx]/256;
+            geometry.vertices[i].z += heights[idx]/64;
+            geometry.vertices[i+1].z += heights[idx]/64;
+            geometry.vertices[i+tileSize-1].z += heights[idx]/64;
+            geometry.vertices[i+tileSize].z += heights[idx]/64;
         }
         
         var vertices = geometry.vertices;
@@ -130,9 +131,13 @@ var Level = function(fl) {
             return ;
         }
         for (i =0; i < config.models.length; i++) {
-            models[i] = new BinModel(fl.getData(config.models[i]));
+            models[i] = new BinModel(
+                scene, 
+                config.models[0].places[0], 
+                fl.getData(config.models[i].file)
+            );
         }
-        
+                       
     };
     
     

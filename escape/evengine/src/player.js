@@ -73,7 +73,9 @@ var Player = function() {
     this.reduceSpeed = function() {
         if (speed > 0) {
            speed -=0.1;
-        }        
+        } else {
+           speed = 0;
+        }
     };
     
     this.lookUp = function() {
@@ -88,13 +90,13 @@ var Player = function() {
     this.lookLeft = function() {
         camera.rotateOnAxis(new THREE.Vector3(0,1,0), 0.02);
         // let's barrel roll a bit !
-         camera.rotateOnAxis(new THREE.Vector3(0,0,1), 0.01);
+         camera.rotateOnAxis(new THREE.Vector3(1,0,0), -0.02);
     };
     
     this.lookRight = function() {
         camera.rotateOnAxis(new THREE.Vector3(0,1,0), -0.02);
         // let's barrel roll a bit !
-        camera.rotateOnAxis(new THREE.Vector3(0,0,1), -0.01);
+        camera.rotateOnAxis(new THREE.Vector3(1,0,0), -0.02);
     };
 
 
