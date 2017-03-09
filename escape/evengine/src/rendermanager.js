@@ -6,6 +6,9 @@ function RenderManager() {
     var player;
     var gamepad;
 
+    var raycaster = new THREE.Raycaster();
+
+    
     this.getCamera = function() {
         return camera;
     };
@@ -23,7 +26,6 @@ function RenderManager() {
     
     
     var anticipateGroundCollision = function() {
-        var raycaster = new THREE.Raycaster();
         raycaster.setFromCamera(new THREE.Vector2(0,0), camera);
         var intersections = raycaster.intersectObject(scene, true);
         
@@ -127,9 +129,9 @@ function RenderManager() {
     };
     
     var camera = new THREE.PerspectiveCamera( 45,
-                            window.innerWidth/window.innerHeight,0.001,100  );
-    camera.position.z = 30 ;
-    camera.position.y = -30;
+                            window.innerWidth/window.innerHeight,0.001,20  );
+    camera.position.z = 300 ;
+    camera.position.y = -100;
     camera.lookAt(new THREE.Vector3(0,0,0));
     
     renderer.setClearColor(0xaaaaaa);

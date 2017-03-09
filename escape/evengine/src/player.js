@@ -41,12 +41,15 @@ var Player = function() {
         }
     };
     
+    var dir = new THREE.Vector3();
+    var ref = new THREE.Vector3();
+    var q = new THREE.Quaternion();
+    var q0, n;
+    
     this.handleGroundCollision = function(distance,object,face) {
         if (distance < speed) {
             // then we have to do something !            
-            var n = face.normal;
-            var dir = new THREE.Vector3();
-            var ref = new THREE.Vector3();
+            n = face.normal;
             camera.getWorldDirection(dir);
             ref=dir.clone();
             ref.reflect(n);
@@ -54,9 +57,8 @@ var Player = function() {
             dir.normalize();
             
             
-            var q = new THREE.Quaternion();
             q.setFromUnitVectors(dir,ref);
-            var q0 = camera.getWorldQuaternion();
+            q0 = camera.getWorldQuaternion();
             q.premultiply(q0);
             camera.setRotationFromQuaternion(q);
             this.reduceSpeed();
@@ -90,13 +92,13 @@ var Player = function() {
     this.lookLeft = function() {
         camera.rotateOnAxis(new THREE.Vector3(0,1,0), 0.02);
         // let's barrel roll a bit !
-         camera.rotateOnAxis(new THREE.Vector3(1,0,0), -0.02);
+         //camera.rotateOnAxis(new THREE.Vector3(1,0,0), -0.02);
     };
     
     this.lookRight = function() {
         camera.rotateOnAxis(new THREE.Vector3(0,1,0), -0.02);
         // let's barrel roll a bit !
-        camera.rotateOnAxis(new THREE.Vector3(1,0,0), -0.02);
+        //camera.rotateOnAxis(new THREE.Vector3(1,0,0), -0.02);
     };
 
 

@@ -155,7 +155,6 @@ var BinModel = function(scene, place, buffer) {
             new THREE.Vector3(data[i]/nUnit, data[i+1]/nUnit, data[i+2]/nUnit)
         );
     }
-    console.log("vertices", geometry.vertices);
     
 
     var section = data[dOffset];
@@ -168,8 +167,7 @@ var BinModel = function(scene, place, buffer) {
         console.log("next section", section.toString(16));
 
     }
-    console.log("faces", geometry.faces);
-    geometry.computeFaceNormals();
+    //geometry.computeFaceNormals();
     
     //var mesh = THREE.SceneUtils.createMultiMaterialObject(geometry, materials);
     var mesh = new THREE.Mesh(geometry, new THREE.MultiMaterial(materials));
@@ -178,8 +176,101 @@ var BinModel = function(scene, place, buffer) {
     scene.add(mesh);
     console.log(mesh);
     
+};
+var Ground = function(heightArray, textureArray, textures, texturePath) {
+    // this is another attempt aiming at segmenting the problem of ground texture generation
+    var tileSize = 256;
+    var heightMap = new Uint8Array(heightArray);
+    var textureMap = new Uint8Array(textureArray);
+    var tLoader = new THREE.TextureLoader();
+    tLoader.setPath(texturePath);
+    var groundGroup = new THREE.Group();
     
     
+    var i,j,k,idx;
+    
+    // then we make the patches (1 for each material)
+    // very naive method to see what kind of performance we can achieve
+    // in a few passes, quads and textures at the same time.
+    // up to 16x more spaces for vertices
+    
+    // we will try to share vertices between geometries !
+    var vertices = [];
+    var h,tid;
+
+    // this is the foundation of our vertices !
+    for (i=0; i <  257; i++) {
+        for (j=0; j < 257; j++) {
+            h = heightMap[i%256 + 256*(j%256)];                
+            vertices.push(new THREE.Vector3(i,j,h/64));
+        }            
+    }
+    
+    // now let's build our faces 
+    var fid;
+    for ( k=0; k < textures.length; k++) {
+        var geometry = new THREE.Geometry();
+        var material = new THREE.MeshLambertMaterial(
+            {color: 0xffffff, map: tLoader.load(textures[k]+'.png') }
+            //{color: 0xffffff }
+        );
+        
+        geometry.vertices = vertices;
+        for (i = 0; i < 256; i++) {
+            for (j=0; j < 256; j++) {
+                tid = textureMap[j%256 + 256*(i%256)];
+                
+                if (tid === k) {
+                    fid = geometry.faces.length;
+                    
+                    geometry.faces.push( new THREE.Face3(
+                        i + 257*j,
+                        i + 257*(j+1),
+                        (i+1) + 257*j
+                    ) );
+                    geometry.faces.push( new THREE.Face3(
+                        i + 257*(j+1),
+                        (i+1) + 257*(j+1),
+                        (i+1) + 257*j
+                    ) );
+                    
+                    geometry.faceVertexUvs[0][fid] = [
+                        new THREE.Vector2(0,1),
+                        new THREE.Vector2(0,0),
+                        new THREE.Vector2(1,1)
+                    ];
+                    geometry.faceVertexUvs[0][fid+1] = [
+                        new THREE.Vector2(0,0),
+                        new THREE.Vector2(1,0),
+                        new THREE.Vector2(1,1)
+                    ];
+                    
+                }
+            }
+        }
+        
+        geometry.verticesNeedUpdate = true;
+        geometry.computeVertexNormals();
+        geometry.normalsNeedUpdate = true;
+        geometry.uvsNeedUpdate=true;
+        
+        // then let's convert it to a buffer geometry
+        var bgeom = new THREE.BufferGeometry();
+        bgeom.fromGeometry(geometry);
+        
+        groundGroup.add(new THREE.Mesh(bgeom, material));
+        
+    }
+    
+//     groundGroup.position.x = -128;
+//     groundGroup.position.y = -128;
+  
+  
+    this.getObject = function() {
+        return groundGroup;
+    };
+        
+
 };
 var Player = function() {
     var camera;
@@ -224,12 +315,15 @@ var Player = function() {
         }
     };
     
+    var dir = new THREE.Vector3();
+    var ref = new THREE.Vector3();
+    var q = new THREE.Quaternion();
+    var q0, n;
+    
     this.handleGroundCollision = function(distance,object,face) {
         if (distance < speed) {
             // then we have to do something !            
-            var n = face.normal;
-            var dir = new THREE.Vector3();
-            var ref = new THREE.Vector3();
+            n = face.normal;
             camera.getWorldDirection(dir);
             ref=dir.clone();
             ref.reflect(n);
@@ -237,9 +331,8 @@ var Player = function() {
             dir.normalize();
             
             
-            var q = new THREE.Quaternion();
             q.setFromUnitVectors(dir,ref);
-            var q0 = camera.getWorldQuaternion();
+            q0 = camera.getWorldQuaternion();
             q.premultiply(q0);
             camera.setRotationFromQuaternion(q);
             this.reduceSpeed();
@@ -273,13 +366,13 @@ var Player = function() {
     this.lookLeft = function() {
         camera.rotateOnAxis(new THREE.Vector3(0,1,0), 0.02);
         // let's barrel roll a bit !
-         camera.rotateOnAxis(new THREE.Vector3(1,0,0), -0.02);
+         //camera.rotateOnAxis(new THREE.Vector3(1,0,0), -0.02);
     };
     
     this.lookRight = function() {
         camera.rotateOnAxis(new THREE.Vector3(0,1,0), -0.02);
         // let's barrel roll a bit !
-        camera.rotateOnAxis(new THREE.Vector3(1,0,0), -0.02);
+        //camera.rotateOnAxis(new THREE.Vector3(1,0,0), -0.02);
     };
 
 
@@ -316,13 +409,7 @@ var Level = function(fl) {
                 p.push(fl.loadData(c.models[i].file));
             }
         }
-        
-        /*return fl.loadData(config.heightMap).then(
-                function() { return fl.loadData(config.textureMap); }
-            ).then(
-                function() { return fl.loadTexture(config.texture); }
-            );*/
-        
+                
         return Promise.all(p);
     };
     
@@ -330,6 +417,45 @@ var Level = function(fl) {
     this.getScene = function() {
         return scene;
     }
+    
+    var buildMesh = function() {
+        var tileSize = 256;
+        var geometries = []; //new THREE.Geometry();
+        var heights = new Uint8Array(fl.getData(config.heightMap));
+        var textures = new Uint8Array(fl.getData(config.textureMap));
+        var tLoader = new THREE.TextureLoader();
+        tLoader.setPath(config.texturePath);
+        var materials = [];
+        
+        var i,j,k,idx;
+        // first, we load textures
+        for (i=0; i < config.textures.length; i++) {
+            materials.push(
+                new THREE.MeshLambertMaterial(
+                    {color: 0xffffff, map: tLoader.load(config.textures[i]+'.png') }
+                )
+            );
+        }
+        
+        // then we make the patches (1 for each material)
+        // very naive method to see what kind of performance we can achieve
+        // in a few passes, quads and textures at the same time.
+        // up to 16x more spaces for vertices
+        for (k = 0; k < materials.length(); k++) {
+            let geom = new THREE.Geometry();
+            for (i =0; i <  256; i++) {
+                for (j=0; j < 256; j++) {
+                    
+                    
+                    
+                }            
+            }
+        }
+  
+        
+        return mesh;        
+    };
+    
     
     var buildGeometry = function( ) {
         var tileSize = 256;
@@ -428,15 +554,28 @@ var Level = function(fl) {
     
     
     this.buildSceneGraph = function() {
-        var texture = fl.getData(config.texture);
+        //var texture = fl.getData(config.texture);
         scene = new THREE.Scene();
 
         scene.fog = /*new THREE.FogExp2(0xaaaaaa);*/new THREE.Fog(0xaaaaaa, 0.0625, 20);        
-        var meshLevel = new THREE.Mesh(
-            buildGeometry(),
-            new THREE.MeshLambertMaterial({color : 0xffffff, map: texture})
-            //new THREE.MeshNormalMaterial()
+//         var meshLevel = new THREE.Mesh(
+//             buildGeometry(),
+//             new THREE.MeshLambertMaterial({color : 0xffffff, map: texture})
+//             //new THREE.MeshNormalMaterial()
+//         );
+        //var meshLevel = buildMesh();
+        var ground = new Ground(
+            fl.getData(config.heightMap),
+            fl.getData(config.textureMap),
+            config.textures,
+            config.texturePath            
         );
+        
+        console.log("config",config);
+        
+        var meshLevel = ground.getObject();
+        
+        
         meshLevel.name = "ground";
         var light = new THREE.DirectionalLight();
         light.position.x = -1;
@@ -454,7 +593,7 @@ var Level = function(fl) {
             config.navigation[0].roll
         );
         
-        this.buildObjects();
+        //this.buildObjects();
     };
     
     //buildSceneGraph();    
@@ -468,6 +607,9 @@ function RenderManager() {
     var player;
     var gamepad;
 
+    var raycaster = new THREE.Raycaster();
+
+    
     this.getCamera = function() {
         return camera;
     };
@@ -485,7 +627,6 @@ function RenderManager() {
     
     
     var anticipateGroundCollision = function() {
-        var raycaster = new THREE.Raycaster();
         raycaster.setFromCamera(new THREE.Vector2(0,0), camera);
         var intersections = raycaster.intersectObject(scene, true);
         
@@ -589,9 +730,9 @@ function RenderManager() {
     };
     
     var camera = new THREE.PerspectiveCamera( 45,
-                            window.innerWidth/window.innerHeight,0.001,100  );
-    camera.position.z = 30 ;
-    camera.position.y = -30;
+                            window.innerWidth/window.innerHeight,0.001,20  );
+    camera.position.z = 300 ;
+    camera.position.y = -100;
     camera.lookAt(new THREE.Vector3(0,0,0));
     
     renderer.setClearColor(0xaaaaaa);

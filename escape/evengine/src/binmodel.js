@@ -92,7 +92,6 @@ var BinModel = function(scene, place, buffer) {
             new THREE.Vector3(data[i]/nUnit, data[i+1]/nUnit, data[i+2]/nUnit)
         );
     }
-    console.log("vertices", geometry.vertices);
     
 
     var section = data[dOffset];
@@ -105,8 +104,7 @@ var BinModel = function(scene, place, buffer) {
         console.log("next section", section.toString(16));
 
     }
-    console.log("faces", geometry.faces);
-    geometry.computeFaceNormals();
+    //geometry.computeFaceNormals();
     
     //var mesh = THREE.SceneUtils.createMultiMaterialObject(geometry, materials);
     var mesh = new THREE.Mesh(geometry, new THREE.MultiMaterial(materials));
@@ -114,7 +112,5 @@ var BinModel = function(scene, place, buffer) {
     mesh.rotation.x = Math.PI/2;
     scene.add(mesh);
     console.log(mesh);
-    
-    
     
 };

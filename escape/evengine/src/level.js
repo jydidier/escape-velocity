@@ -30,13 +30,7 @@ var Level = function(fl) {
                 p.push(fl.loadData(c.models[i].file));
             }
         }
-        
-        /*return fl.loadData(config.heightMap).then(
-                function() { return fl.loadData(config.textureMap); }
-            ).then(
-                function() { return fl.loadTexture(config.texture); }
-            );*/
-        
+                
         return Promise.all(p);
     };
     
@@ -44,6 +38,45 @@ var Level = function(fl) {
     this.getScene = function() {
         return scene;
     }
+    
+    var buildMesh = function() {
+        var tileSize = 256;
+        var geometries = []; //new THREE.Geometry();
+        var heights = new Uint8Array(fl.getData(config.heightMap));
+        var textures = new Uint8Array(fl.getData(config.textureMap));
+        var tLoader = new THREE.TextureLoader();
+        tLoader.setPath(config.texturePath);
+        var materials = [];
+        
+        var i,j,k,idx;
+        // first, we load textures
+        for (i=0; i < config.textures.length; i++) {
+            materials.push(
+                new THREE.MeshLambertMaterial(
+                    {color: 0xffffff, map: tLoader.load(config.textures[i]+'.png') }
+                )
+            );
+        }
+        
+        // then we make the patches (1 for each material)
+        // very naive method to see what kind of performance we can achieve
+        // in a few passes, quads and textures at the same time.
+        // up to 16x more spaces for vertices
+        for (k = 0; k < materials.length(); k++) {
+            let geom = new THREE.Geometry();
+            for (i =0; i <  256; i++) {
+                for (j=0; j < 256; j++) {
+                    
+                    
+                    
+                }            
+            }
+        }
+  
+        
+        return mesh;        
+    };
+    
     
     var buildGeometry = function( ) {
         var tileSize = 256;
@@ -142,15 +175,28 @@ var Level = function(fl) {
     
     
     this.buildSceneGraph = function() {
-        var texture = fl.getData(config.texture);
+        //var texture = fl.getData(config.texture);
         scene = new THREE.Scene();
 
         scene.fog = /*new THREE.FogExp2(0xaaaaaa);*/new THREE.Fog(0xaaaaaa, 0.0625, 20);        
-        var meshLevel = new THREE.Mesh(
-            buildGeometry(),
-            new THREE.MeshLambertMaterial({color : 0xffffff, map: texture})
-            //new THREE.MeshNormalMaterial()
+//         var meshLevel = new THREE.Mesh(
+//             buildGeometry(),
+//             new THREE.MeshLambertMaterial({color : 0xffffff, map: texture})
+//             //new THREE.MeshNormalMaterial()
+//         );
+        //var meshLevel = buildMesh();
+        var ground = new Ground(
+            fl.getData(config.heightMap),
+            fl.getData(config.textureMap),
+            config.textures,
+            config.texturePath            
         );
+        
+        console.log("config",config);
+        
+        var meshLevel = ground.getObject();
+        
+        
         meshLevel.name = "ground";
         var light = new THREE.DirectionalLight();
         light.position.x = -1;
@@ -168,7 +214,7 @@ var Level = function(fl) {
             config.navigation[0].roll
         );
         
-        this.buildObjects();
+        //this.buildObjects();
     };
     
     //buildSceneGraph();    

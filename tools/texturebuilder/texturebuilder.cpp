@@ -6,6 +6,7 @@
 #include <QColor>
 #include <QFileInfo>
 #include <QVector>
+#include <cmath>
 
 
 
@@ -20,26 +21,58 @@ QByteArray readFile(QString name) {
     return res;    
 }
 
-// this is probably the best way to turn texture.
+
+
+
+// this is the accurate way to convert textures !
 void createSimpleTexture(QString fileName, QImage& image) {
     QByteArray texData = readFile(fileName);
+    int width = image.width();
     if (!texData.isEmpty()) {        
-        // pb: some textures are bigger than 4096 bytes !
-        if (texData.size() == 4096) {
-            for (int i=0; i < 4096; i++) {
-                image.setPixel( 
-                    (i % 64),
-                    (i / 64),
-                    (unsigned char)texData[i]
-                );
-                //std::cout << (int)texData[i] << std::endl;
-            }
+        for (int i=0; i < texData.size(); i++) {
+            image.setPixel( 
+                (i % width),
+                (i / width),
+                (unsigned char)texData[i]
+            );
         } 
     }
 }
 
+// we create a new function that, to be usable, will use a palette, a filename
+// and produce and write down a texture.
 
-void createTexture(QString fileName, QImage& image) {
+void setupAndSaveImage(QFileInfo fileInfo, const QVector<QRgb>& palette) {
+    int width, height;
+    QString fileName = fileInfo.fileName();
+    
+    if (!fileInfo.exists()) {
+        std::cerr << qPrintable(fileName) << " not found." << std::endl;
+        return;
+    }
+
+    if (fileInfo.size() == 64000) {
+        width = 320;
+        height = 200;            
+    } else {
+        int side = sqrt(fileInfo.size());
+        
+        if (side * side == fileInfo.size()) {
+            width = height = side;
+        } else {
+            std::cerr << "Cannot handle this texture size." << std::endl;
+            return ;
+        }
+    }
+            
+    QImage finalTexture = QImage(width,height,QImage::Format_Indexed8);
+    finalTexture.setColorTable(palette);
+    createSimpleTexture(fileName, finalTexture);        
+    finalTexture.save(fileName  +".png");    
+}
+
+
+void createTextures(QString fileName,const QVector<QRgb>& palette) {
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly)) {
         return;
@@ -51,43 +84,17 @@ void createTexture(QString fileName, QImage& image) {
     for(int p = 0; p < numTextures; p++) {
         QString fileTexture;
         textFile >> fileTexture;
+        QFileInfo fileInfo(fileTexture);
         
-        QByteArray texData = readFile(fileTexture);
-        if (!texData.isEmpty()) {
-            int s = (15 - p / 16) * 64;
-            int r = (p % 16) * 64;
-            
-            // pb: some textures are bigger than 4096 bytes !
-            if (texData.size() == 4096) {
-                for (int i=0; i < 4096; i++) {
-                    image.setPixel( 
-                        r + (i / 64),
-                        s + (i % 64),
-                        (unsigned char)texData[i]
-                    );
-                    //std::cout << (int)texData[i] << std::endl;
-                }
-            } else {
-                if (texData.size() == 65536) {
-                    for (int i=0; i < 64; i++) {
-                        for (int j=0; j < 64; j++) {
-                            image.setPixel( 
-                                r + (i),
-                                s + (j),
-                                (unsigned char)texData[i*1024+j*4]
-                            );
-                        }
-                    }
-                }
-            }
-        }        
+        setupAndSaveImage(fileInfo, palette);
+        
     }
 }
 
 
 
 void usage(char* name) {
-    std::cout << "usage: " << name << " texturelist.TEX texturepalette.ACT" << std::endl;   
+    std::cout << "usage: " << name << " texturelist.{TEX|RAW} texturepalette.ACT" << std::endl;   
 }
 
 
@@ -108,23 +115,14 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i< 256*3 ; i+=3) {
         palette.push_back(qRgb(paletteData[i], paletteData[i+1], paletteData[i+2]));        
     }
-    // palette is now stored
-    QImage finalTexture; 
 
-
-    // let's read list of textures
     QString fileName(argv[1]);
     
     QFileInfo fileInfo(fileName);
     if (fileInfo.suffix() == "TEX") {
-        finalTexture = QImage(1024,1024,QImage::Format_Indexed8);
-        finalTexture.setColorTable(palette);        
-        createTexture(fileName, finalTexture);
+        createTextures(fileName, palette);
     } else {
-        finalTexture = QImage(64,64,QImage::Format_Indexed8);
-        finalTexture.setColorTable(palette);
-        createSimpleTexture(fileName, finalTexture);        
+        setupAndSaveImage(fileInfo, palette);
     }
-    finalTexture.save(fileName  +".png");
     return 0;
 }
