@@ -17,13 +17,30 @@ var Ground = function(heightArray, textureArray, textures, texturePath) {
     
     // we will try to share vertices between geometries !
     var vertices = [];
+    var normals = [];
     var h,tid;
+    var v1, v2, f1, f2;
 
     // this is the foundation of our vertices !
     for (i=0; i <  257; i++) {
         for (j=0; j < 257; j++) {
             h = heightMap[i%256 + 256*(j%256)];                
             vertices.push(new THREE.Vector3(i,j,h/64));
+            
+            v1 = new THREE.Vector3(2,0, 
+                (heightMap[(i+1)%256 + 256*(j%256)] -
+                heightMap[(i+255)%256 + 256*(j%256)])/64
+            );
+            
+            v2 = new THREE.Vector3(0,2, 
+                (heightMap[i%256 + 256*((j+1)%256)] -
+                heightMap[i%256 + 256*((j+255)%256)])/64
+            );
+            
+            v1.cross(v2);
+            v1.normalize();
+            
+            normals.push(v1);
         }            
     }
     
@@ -44,16 +61,33 @@ var Ground = function(heightArray, textureArray, textures, texturePath) {
                 if (tid === k) {
                     fid = geometry.faces.length;
                     
-                    geometry.faces.push( new THREE.Face3(
+                    f1 = new THREE.Face3(
                         i + 257*j,
                         i + 257*(j+1),
                         (i+1) + 257*j
-                    ) );
-                    geometry.faces.push( new THREE.Face3(
+                    );
+                    
+                    f1.vertexNormals = [
+                        normals[i + 257*j],
+                        normals[i + 257*(j+1)],
+                        normals[(i+1) + 257*j]
+                    ];
+                    
+                    f2 = new THREE.Face3(
                         i + 257*(j+1),
                         (i+1) + 257*(j+1),
                         (i+1) + 257*j
-                    ) );
+                    );
+                    
+                    f2.vertexNormals = [
+                        normals[i + 257*(j+1)],
+                        normals[(i+1) + 257*(j+1)],
+                        normals[(i+1) + 257*j]                    
+                    ];
+                    
+                    
+                    geometry.faces.push(f1);
+                    geometry.faces.push(f2);
                     
                     geometry.faceVertexUvs[0][fid] = [
                         new THREE.Vector2(0,1),
@@ -71,7 +105,7 @@ var Ground = function(heightArray, textureArray, textures, texturePath) {
         }
         
         geometry.verticesNeedUpdate = true;
-        geometry.computeVertexNormals();
+        //geometry.computeVertexNormals();
         geometry.normalsNeedUpdate = true;
         geometry.uvsNeedUpdate=true;
         
