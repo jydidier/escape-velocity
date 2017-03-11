@@ -3,6 +3,7 @@ var Player = function() {
     var speed = 0.1;
     var clock = new THREE.Clock(false);
     var barrel = 0;
+    var zz = new THREE.Vector3(0,0,1);
     
     this.setCamera = function (c) {
         camera = c;        
@@ -34,10 +35,34 @@ var Player = function() {
             
             // we need to stabilize barrel roll
 
-//             camera.rotateOnAxis(new THREE.Vector3(0,0,1), -0.1*barrel);
-//             barrel -= 0.1*barrel;
-//             console.log(barrel);
-//             
+            // we compute the direction to which we must stabilize
+            camera.updateMatrixWorld(true);
+            var x = new THREE.Vector3();
+            var y = new THREE.Vector3();
+            var z = new THREE.Vector3();
+            camera.matrix.extractBasis(x,y,z);
+            var plane = new THREE.Plane(camera.getWorldDirection());
+            var x = plane.projectPoint(zz);            
+            x.normalize();                    
+            var dir = zz.dot(camera.getWorldDirection());
+            
+            // to avoid gimbal lock
+            if (dir > 0.9 || dir < -0.9) {
+                return;
+            } 
+            
+            // to detect if we are upside down
+            if (zz.dot(y) < 0) {
+                y.negate();
+            }
+
+            // we compute how much we must rotate to go back to stabilization
+            var q = new THREE.Quaternion();
+            q.setFromUnitVectors(y, x);
+            var q0 = camera.quaternion;
+            q.multiply(q0);
+            q0.slerp(q,0.1);
+            //camera.setRotationFromQuaternion(q0);
         }
     };
     
@@ -81,24 +106,25 @@ var Player = function() {
     };
     
     this.lookUp = function() {
-        camera.rotateOnAxis(new THREE.Vector3(1,0,0), 0.02);
+        camera.rotateOnAxis(new THREE.Vector3(1,0,0), 0.05);
     };
 
     this.lookDown = function() {
-        camera.rotateOnAxis(new THREE.Vector3(1,0,0), -0.02);
-        
+        camera.rotateOnAxis(new THREE.Vector3(1,0,0), -0.05);
     };
     
     this.lookLeft = function() {
-        camera.rotateOnAxis(new THREE.Vector3(0,1,0), 0.02);
+        camera.rotateOnAxis(new THREE.Vector3(0,1,0), 0.05);
         // let's barrel roll a bit !
-         //camera.rotateOnAxis(new THREE.Vector3(1,0,0), -0.02);
+        camera.rotateOnAxis(new THREE.Vector3(0,0,1), 0.05);
+        //camera.rotateOnAxis(new THREE.Vector3(1,0,0), -0.05);
     };
     
     this.lookRight = function() {
-        camera.rotateOnAxis(new THREE.Vector3(0,1,0), -0.02);
+        camera.rotateOnAxis(new THREE.Vector3(0,1,0), -0.05);
         // let's barrel roll a bit !
-        //camera.rotateOnAxis(new THREE.Vector3(1,0,0), -0.02);
+        camera.rotateOnAxis(new THREE.Vector3(0,0,1), -0.05);
+        //camera.rotateOnAxis(new THREE.Vector3(1,0,0), -0.05);
     };
 
 

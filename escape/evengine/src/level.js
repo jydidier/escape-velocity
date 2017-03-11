@@ -192,7 +192,6 @@ var Level = function(fl) {
             config.texturePath            
         );
         
-        console.log("config",config);
         
         var meshLevel = ground.getObject();
         
@@ -214,7 +213,7 @@ var Level = function(fl) {
             config.navigation[0].roll
         );
         
-        //this.buildObjects();
+        this.buildObjects();
     };
     
     //buildSceneGraph();    

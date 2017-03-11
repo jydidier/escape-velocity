@@ -5,9 +5,12 @@ function RenderManager() {
     var self = this;
     var player;
     var gamepad;
+    var paused = false;
 
     var raycaster = new THREE.Raycaster();
 
+    
+    var pause = function() {};
     
     this.getCamera = function() {
         return camera;
@@ -61,8 +64,25 @@ function RenderManager() {
             return ;
         }
         
+        if (e.key === 'p') {
+            paused = !paused;
+            if (!paused) {
+                requestAnimationFrame(self.animate);
+            }
+        }
+        
+        
         if (e.key === 'm') {
             document.getElementById('audio').muted = ! document.getElementById('audio').muted;
+            return ;
+        }
+        
+        if (e.key === 'f') {
+            var elem = document.querySelector('canvas');
+            var fs = elem.requestFullScreen || elem.mozRequestFullScreen || elem.webkitRequestFullScreen ;
+            
+            if (fs) fs.call(elem);
+            
             return ;
         }
         
@@ -121,7 +141,9 @@ function RenderManager() {
             processGamepad();
         }
         
-        requestAnimationFrame(self.animate);
+        if (!paused) {
+            requestAnimationFrame(self.animate);
+        }
     };
 
     var registerGamepad = function(e) {
