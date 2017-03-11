@@ -61,11 +61,15 @@ var FileLoader = function() {
 }    
 //     var byteArray = new Uint8Array(arrayBuffer);
 
-var BinModel = function(scene, place, buffer) {
+var BinModel = function(buffer) {
+    THREE.Mesh.call(this);
+    
+    
     var data = new Int32Array(buffer);
     var unit =  1048576;
     var nUnit = 65535;
     var tUnit = 0xff0000;
+    var vUnit;
     var vNum = data[4];
     var vOffset = 5;
     var dOffset = vOffset + vNum * 3;
@@ -149,10 +153,12 @@ var BinModel = function(scene, place, buffer) {
     if (data[0] === 0x14) {
         console.log("This is a true bin file");
     }
+    vUnit = nUnit / 4;
+    //console.log("scale", data[1]);
     
     for (i=vOffset; i < dOffset; i+=3) {
         geometry.vertices.push(
-            new THREE.Vector3(data[i]/nUnit, data[i+1]/nUnit, data[i+2]/nUnit)
+            new THREE.Vector3(data[i]/vUnit, data[i+1]/vUnit, data[i+2]/vUnit)
         );
     }
     
@@ -170,13 +176,20 @@ var BinModel = function(scene, place, buffer) {
     //geometry.computeFaceNormals();
     
     //var mesh = THREE.SceneUtils.createMultiMaterialObject(geometry, materials);
-    var mesh = new THREE.Mesh(geometry, new THREE.MultiMaterial(materials));
-    mesh.position.fromArray(place);
-    mesh.rotation.x = Math.PI/2;
-    scene.add(mesh);
-    console.log(mesh);
-    
+    //var mesh = new THREE.Mesh(geometry, new THREE.MultiMaterial(materials));
+    this.geometry = geometry;
+    this.material = materials;
 };
+
+
+BinModel.prototype = Object.assign(Object.create(THREE.Mesh.prototype), {
+    constructor: BinModel,
+    
+    clone: function () {
+        return new THREE.Mesh( this.geometry, this.material ).copy( this );
+    }
+
+});
 var Ground = function(heightArray, textureArray, textures, texturePath) {
     // this is another attempt aiming at segmenting the problem of ground texture generation
     var tileSize = 256;
@@ -204,16 +217,16 @@ var Ground = function(heightArray, textureArray, textures, texturePath) {
     for (i=0; i <  257; i++) {
         for (j=0; j < 257; j++) {
             h = heightMap[i%256 + 256*(j%256)];                
-            vertices.push(new THREE.Vector3(i,j,h/64));
+            vertices.push(new THREE.Vector3(i,j,h/32));
             
             v1 = new THREE.Vector3(2,0, 
                 (heightMap[(i+1)%256 + 256*(j%256)] -
-                heightMap[(i+255)%256 + 256*(j%256)])/64
+                heightMap[(i+255)%256 + 256*(j%256)])/32
             );
             
             v2 = new THREE.Vector3(0,2, 
                 (heightMap[i%256 + 256*((j+1)%256)] -
-                heightMap[i%256 + 256*((j+255)%256)])/64
+                heightMap[i%256 + 256*((j+255)%256)])/32
             );
             
             v1.cross(v2);
@@ -335,10 +348,10 @@ var Player = function() {
             goto.multiplyScalar(speed*clock.getDelta());
             camera.position.add(goto);
             
-            if (camera.position.x > 128) { camera.position.x = 128; speed= 0; }
-            if (camera.position.x < -128) { camera.position.x = -128; speed=0; }
-            if (camera.position.y > 128) { camera.position.y = 128; speed = 0; }
-            if (camera.position.y < -128) { camera.position.y = -128; speed = 0;}
+            if (camera.position.x > 256) { camera.position.x = 256; speed= 0; }
+            if (camera.position.x < 0) { camera.position.x = 0; speed=0; }
+            if (camera.position.y > 256) { camera.position.y = 256; speed = 0; }
+            if (camera.position.y < 0) { camera.position.y = 0; speed = 0;}
             
             
             // we need to stabilize barrel roll
@@ -476,138 +489,28 @@ var Level = function(fl) {
     
     this.getScene = function() {
         return scene;
-    }
-    
-    var buildMesh = function() {
-        var tileSize = 256;
-        var geometries = []; //new THREE.Geometry();
-        var heights = new Uint8Array(fl.getData(config.heightMap));
-        var textures = new Uint8Array(fl.getData(config.textureMap));
-        var tLoader = new THREE.TextureLoader();
-        tLoader.setPath(config.texturePath);
-        var materials = [];
-        
-        var i,j,k,idx;
-        // first, we load textures
-        for (i=0; i < config.textures.length; i++) {
-            materials.push(
-                new THREE.MeshLambertMaterial(
-                    {color: 0xffffff, map: tLoader.load(config.textures[i]+'.png') }
-                )
-            );
-        }
-        
-        // then we make the patches (1 for each material)
-        // very naive method to see what kind of performance we can achieve
-        // in a few passes, quads and textures at the same time.
-        // up to 16x more spaces for vertices
-        for (k = 0; k < materials.length(); k++) {
-            let geom = new THREE.Geometry();
-            for (i =0; i <  256; i++) {
-                for (j=0; j < 256; j++) {
-                    
-                    
-                    
-                }            
-            }
-        }
-  
-        
-        return mesh;        
     };
-    
-    
-    var buildGeometry = function( ) {
-        var tileSize = 256;
-        var geometry = new THREE.PlaneGeometry(tileSize, tileSize,tileSize,tileSize);
-        var heights = new Uint8Array(fl.getData(config.heightMap));
-        var textures = new Uint8Array(fl.getData(config.textureMap));
-        var i,j,idx;
         
-        
-        var p,q, vc;
-        for (i=0; i < heights.length; i++) {
-            // if, as I suspect 
-            // height is given at the center of the square
-            // geometry.vertices[i].z = heights[i]/16;
-            p = i % 256;
-            q = (i / 256)|0;
-            
-            vc = geometry.vertices[i];
-            idx = (vc.x + 128) + 256 * // résultat pouvant donner 256
-                (128 - vc.y);
-                
-            
-            
-            geometry.vertices[i].z += heights[idx]/64;
-            geometry.vertices[i+1].z += heights[idx]/64;
-            geometry.vertices[i+tileSize-1].z += heights[idx]/64;
-            geometry.vertices[i+tileSize].z += heights[idx]/64;
-        }
-        
-        var vertices = geometry.vertices;
-        var faces = geometry.faces;
-        
-        
-
-        var vc, r, s, tidx, shift,tc, tb, ta;
-        for (i=0; i < faces.length; i++) {
-            /*v1 = vertices[faces[i].a] ;
-            v2 = vertices[faces[i].b] ;*/
-            vc = vertices[faces[i].c] ;
-            // this should be computed according to vertex position
-            // a,b,c = 0,257,1  a,b,c = 257,258,1
-            // use c as an anchor
-            
-            ta = faces[i].a ;
-            tb = faces[i].b ;
-            tc = faces[i].c ;
-            
-            //
-            tidx = textures[
-                (vc.x + 127) + 256 * // résultat pouvant donner 256
-                (128 - vc.y) // résultat pouvant donner 256
-                
-                
-                // tc - 1
-            ];
-            
-            r = (tidx % 16) *64 / 1024 + 0.5 / 1024 ; // offsets
-            s = ((tidx / 16)|0) *64 / 1024 + 63.5 / 1024 ; // offsets
-            shift = 63/1024;
-            
-            geometry.faceVertexUvs[0][i] = [
-                new THREE.Vector2(r , s - (((tc-ta) > 0)?0:shift) ),
-                new THREE.Vector2(r + (((tb - ta) === 1)?shift:0) , s - shift ),
-                new THREE.Vector2(r + shift, s)
-            ];
-            
-        }
-        
-        geometry.verticesNeedUpdate = true;
-        geometry.computeVertexNormals();
-        geometry.normalsNeedUpdate = true;
-        geometry.uvsNeedUpdate=true;
-        
-        console.log(geometry);
-        console.log(textures);
-        
-        var bgeom = new THREE.BufferGeometry();
-        bgeom.fromGeometry(geometry);
-        return bgeom;        
-    };
-    
     this.buildObjects = function() {
-        var i;
+        var i,j,instance,configModel;
         if (config.models === undefined) {
             return ;
         }
-        for (i =0; i < config.models.length; i++) {
+        for (i =0; i < config.models.length; i++) {           
             models[i] = new BinModel(
-                scene, 
-                config.models[0].places[0], 
                 fl.getData(config.models[i].file)
             );
+            models[i].rotation.x = Math.PI/2;
+            
+            configModel = config.models[i]; 
+            for(j = 0; j < configModel.places.length; j++) {
+                instance = models[i].clone();
+                
+                instance.position.x = (configModel.places[j][0]+256)%256;
+                instance.position.y = (configModel.places[j][2]+256)%256;
+                instance.position.z = configModel.places[j][1];
+                scene.add(instance);
+            }
         }
                        
     };
@@ -644,9 +547,9 @@ var Level = function(fl) {
         scene.add(light);
         
         this.player.setPosition(
-            config.navigation[0].x, 
-            config.navigation[0].y, 
-            config.navigation[0].z,
+            (config.navigation[0].x+256)%256, 
+            (config.navigation[0].z/32), 
+            (config.navigation[0].y+256)%256,
             config.navigation[0].pitch,
             config.navigation[0].yaw,
             config.navigation[0].roll

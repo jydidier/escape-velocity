@@ -27,10 +27,10 @@ var Player = function() {
             goto.multiplyScalar(speed*clock.getDelta());
             camera.position.add(goto);
             
-            if (camera.position.x > 128) { camera.position.x = 128; speed= 0; }
-            if (camera.position.x < -128) { camera.position.x = -128; speed=0; }
-            if (camera.position.y > 128) { camera.position.y = 128; speed = 0; }
-            if (camera.position.y < -128) { camera.position.y = -128; speed = 0;}
+            if (camera.position.x > 256) { camera.position.x = 256; speed= 0; }
+            if (camera.position.x < 0) { camera.position.x = 0; speed=0; }
+            if (camera.position.y > 256) { camera.position.y = 256; speed = 0; }
+            if (camera.position.y < 0) { camera.position.y = 0; speed = 0;}
             
             
             // we need to stabilize barrel roll

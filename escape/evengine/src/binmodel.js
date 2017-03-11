@@ -1,8 +1,12 @@
-var BinModel = function(scene, place, buffer) {
+var BinModel = function(buffer) {
+    THREE.Mesh.call(this);
+    
+    
     var data = new Int32Array(buffer);
     var unit =  1048576;
     var nUnit = 65535;
     var tUnit = 0xff0000;
+    var vUnit;
     var vNum = data[4];
     var vOffset = 5;
     var dOffset = vOffset + vNum * 3;
@@ -86,10 +90,12 @@ var BinModel = function(scene, place, buffer) {
     if (data[0] === 0x14) {
         console.log("This is a true bin file");
     }
+    vUnit = nUnit / 4;
+    //console.log("scale", data[1]);
     
     for (i=vOffset; i < dOffset; i+=3) {
         geometry.vertices.push(
-            new THREE.Vector3(data[i]/nUnit, data[i+1]/nUnit, data[i+2]/nUnit)
+            new THREE.Vector3(data[i]/vUnit, data[i+1]/vUnit, data[i+2]/vUnit)
         );
     }
     
@@ -107,10 +113,17 @@ var BinModel = function(scene, place, buffer) {
     //geometry.computeFaceNormals();
     
     //var mesh = THREE.SceneUtils.createMultiMaterialObject(geometry, materials);
-    var mesh = new THREE.Mesh(geometry, new THREE.MultiMaterial(materials));
-    mesh.position.fromArray(place);
-    mesh.rotation.x = Math.PI/2;
-    scene.add(mesh);
-    console.log(mesh);
-    
+    //var mesh = new THREE.Mesh(geometry, new THREE.MultiMaterial(materials));
+    this.geometry = geometry;
+    this.material = materials;
 };
+
+
+BinModel.prototype = Object.assign(Object.create(THREE.Mesh.prototype), {
+    constructor: BinModel,
+    
+    clone: function () {
+        return new THREE.Mesh( this.geometry, this.material ).copy( this );
+    }
+
+});

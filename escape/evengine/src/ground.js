@@ -25,16 +25,16 @@ var Ground = function(heightArray, textureArray, textures, texturePath) {
     for (i=0; i <  257; i++) {
         for (j=0; j < 257; j++) {
             h = heightMap[i%256 + 256*(j%256)];                
-            vertices.push(new THREE.Vector3(i,j,h/64));
+            vertices.push(new THREE.Vector3(i,j,h/32));
             
             v1 = new THREE.Vector3(2,0, 
                 (heightMap[(i+1)%256 + 256*(j%256)] -
-                heightMap[(i+255)%256 + 256*(j%256)])/64
+                heightMap[(i+255)%256 + 256*(j%256)])/32
             );
             
             v2 = new THREE.Vector3(0,2, 
                 (heightMap[i%256 + 256*((j+1)%256)] -
-                heightMap[i%256 + 256*((j+255)%256)])/64
+                heightMap[i%256 + 256*((j+255)%256)])/32
             );
             
             v1.cross(v2);
