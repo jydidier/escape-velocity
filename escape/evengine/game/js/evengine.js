@@ -348,11 +348,9 @@ var Player = function() {
             goto.multiplyScalar(speed*clock.getDelta());
             camera.position.add(goto);
             
-            if (camera.position.x > 256) { camera.position.x = 256; speed= 0; }
-            if (camera.position.x < 0) { camera.position.x = 0; speed=0; }
-            if (camera.position.y > 256) { camera.position.y = 256; speed = 0; }
-            if (camera.position.y < 0) { camera.position.y = 0; speed = 0;}
-            
+            // boundless world but real seams
+            camera.position.x = (camera.position.x + 256)%256;
+            camera.position.y = (camera.position.y + 256)%256;
             
             // we need to stabilize barrel roll
 
@@ -548,7 +546,7 @@ var Level = function(fl) {
         
         this.player.setPosition(
             (config.navigation[0].x+256)%256, 
-            (config.navigation[0].z/32), 
+            (config.navigation[0].z), 
             (config.navigation[0].y+256)%256,
             config.navigation[0].pitch,
             config.navigation[0].yaw,
@@ -580,7 +578,64 @@ function RenderManager() {
     };
     
     this.render = function() {
+        renderer.clear();               
+
+        
+        // in case we are near a border, we make a two pass rendering
+        if (camera.position.x < 20 || camera.position.x > 236 ||
+            camera.position.y < 20 || camera.position.y > 236) {
+            // then we trigger ghost rendering of the scene.
+            // in fact, it can add up three more rendering passes
+            
+            ghostCamera.copy(camera);
+            
+            if (camera.position.x < 20) {
+                ghostCamera.position.x += 256;                
+                renderer.render(scene, ghostCamera);                
+            }
+            
+            if (camera.position.x > 236) {
+                ghostCamera.position.x -= 256;                
+                renderer.render(scene, ghostCamera);                
+            }
+            
+            if (camera.position.y < 20) {
+                ghostCamera.position.y += 256;                
+                renderer.render(scene, ghostCamera);                
+            }
+            
+            if (camera.position.y > 236) {
+                ghostCamera.position.y -= 256;                
+                renderer.render(scene, ghostCamera);                
+            }
+            
+            if (camera.position.x < 20 && camera.position.y < 20) {
+                ghostCamera.position.x += 256;
+                ghostCamera.position.y += 256;                
+                renderer.render(scene, ghostCamera);                
+            }
+            
+            if (camera.position.x > 236 && camera.position.y > 236) {
+                ghostCamera.position.x -= 256;
+                ghostCamera.position.y -= 256;                
+                renderer.render(scene, ghostCamera);                
+            }
+
+            if (camera.position.x < 20 && camera.position.y > 236) {
+                ghostCamera.position.x += 256;
+                ghostCamera.position.y -= 256;                
+                renderer.render(scene, ghostCamera);                
+            }
+
+            if (camera.position.x > 236 && camera.position.y < 20) {
+                ghostCamera.position.x -= 256;
+                ghostCamera.position.y += 256;                
+                renderer.render(scene, ghostCamera);                
+            }
+        
+        }
         renderer.render(scene, camera);
+        
     };
 
     var resize = function() {
@@ -718,9 +773,11 @@ function RenderManager() {
     camera.position.z = 300 ;
     camera.position.y = -100;
     camera.lookAt(new THREE.Vector3(0,0,0));
+    var ghostCamera = camera.clone();  
     
     renderer.setClearColor(0xaaaaaa);
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.autoClear = false;
     window.onresize =  resize;
     document.body.onkeypress = keyPress;
     

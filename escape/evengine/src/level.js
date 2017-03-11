@@ -96,7 +96,7 @@ var Level = function(fl) {
         
         this.player.setPosition(
             (config.navigation[0].x+256)%256, 
-            (config.navigation[0].z/32), 
+            (config.navigation[0].z), 
             (config.navigation[0].y+256)%256,
             config.navigation[0].pitch,
             config.navigation[0].yaw,

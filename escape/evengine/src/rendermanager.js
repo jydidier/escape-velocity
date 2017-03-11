@@ -17,7 +17,64 @@ function RenderManager() {
     };
     
     this.render = function() {
+        renderer.clear();               
+
+        
+        // in case we are near a border, we make a two pass rendering
+        if (camera.position.x < 20 || camera.position.x > 236 ||
+            camera.position.y < 20 || camera.position.y > 236) {
+            // then we trigger ghost rendering of the scene.
+            // in fact, it can add up three more rendering passes
+            
+            ghostCamera.copy(camera);
+            
+            if (camera.position.x < 20) {
+                ghostCamera.position.x += 256;                
+                renderer.render(scene, ghostCamera);                
+            }
+            
+            if (camera.position.x > 236) {
+                ghostCamera.position.x -= 256;                
+                renderer.render(scene, ghostCamera);                
+            }
+            
+            if (camera.position.y < 20) {
+                ghostCamera.position.y += 256;                
+                renderer.render(scene, ghostCamera);                
+            }
+            
+            if (camera.position.y > 236) {
+                ghostCamera.position.y -= 256;                
+                renderer.render(scene, ghostCamera);                
+            }
+            
+            if (camera.position.x < 20 && camera.position.y < 20) {
+                ghostCamera.position.x += 256;
+                ghostCamera.position.y += 256;                
+                renderer.render(scene, ghostCamera);                
+            }
+            
+            if (camera.position.x > 236 && camera.position.y > 236) {
+                ghostCamera.position.x -= 256;
+                ghostCamera.position.y -= 256;                
+                renderer.render(scene, ghostCamera);                
+            }
+
+            if (camera.position.x < 20 && camera.position.y > 236) {
+                ghostCamera.position.x += 256;
+                ghostCamera.position.y -= 256;                
+                renderer.render(scene, ghostCamera);                
+            }
+
+            if (camera.position.x > 236 && camera.position.y < 20) {
+                ghostCamera.position.x -= 256;
+                ghostCamera.position.y += 256;                
+                renderer.render(scene, ghostCamera);                
+            }
+        
+        }
         renderer.render(scene, camera);
+        
     };
 
     var resize = function() {
@@ -155,9 +212,11 @@ function RenderManager() {
     camera.position.z = 300 ;
     camera.position.y = -100;
     camera.lookAt(new THREE.Vector3(0,0,0));
+    var ghostCamera = camera.clone();  
     
     renderer.setClearColor(0xaaaaaa);
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.autoClear = false;
     window.onresize =  resize;
     document.body.onkeypress = keyPress;
     

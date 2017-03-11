@@ -27,11 +27,9 @@ var Player = function() {
             goto.multiplyScalar(speed*clock.getDelta());
             camera.position.add(goto);
             
-            if (camera.position.x > 256) { camera.position.x = 256; speed= 0; }
-            if (camera.position.x < 0) { camera.position.x = 0; speed=0; }
-            if (camera.position.y > 256) { camera.position.y = 256; speed = 0; }
-            if (camera.position.y < 0) { camera.position.y = 0; speed = 0;}
-            
+            // boundless world but real seams
+            camera.position.x = (camera.position.x + 256)%256;
+            camera.position.y = (camera.position.y + 256)%256;
             
             // we need to stabilize barrel roll
 
