@@ -7,6 +7,9 @@ var Level = function(fl) {
     var fileLoader = fl;
     var models = [];
     this.player = new Player();
+    var renderer;
+    var rt = new THREE.WebGLRenderTarget(1024,1024 ,{type:  THREE.UnsignedByteType, format:THREE.RGBAFormat});
+    
         
     this.init = function(c) {
         config = c;
@@ -30,7 +33,6 @@ var Level = function(fl) {
                 p.push(fl.loadData(c.models[i].file));
             }
         }
-                
         return Promise.all(p);
     };
     
@@ -63,6 +65,47 @@ var Level = function(fl) {
                        
     };
     
+    this.setRenderer = function(r) {
+        renderer = r;
+    };
+
+    
+    
+    var createMinimap = function() {
+        if (renderer === undefined) 
+            return ;
+        
+        var fog = scene.fog.clone();
+        scene.fog = null;
+        
+        var rtcamera = new THREE.OrthographicCamera(-128, 128, 128, -128, -1000, 1000);
+        
+        rtcamera.position.x = 128;
+        rtcamera.position.y = 128;
+        rtcamera.position.z = 0;
+        rtcamera.lookAt(new THREE.Vector3(128,128,-1));
+        //renderer.render(scene, rtcamera);
+        renderer.render(scene, rtcamera, rt);
+        
+        var size = 1024*1024*4;
+        var buffer = new Uint8Array((1024*1024*4)|0);
+
+        renderer.readRenderTargetPixels ( rt, 0, 0, 1024, 1024, buffer );
+        
+        
+        var clampedArray = Uint8ClampedArray.from(buffer);
+
+        
+        var canvas = document.getElementById('minimap');
+        var ctx = canvas.getContext('2d');
+        ctx.putImageData(new ImageData(clampedArray, 1024,1024),0,0);
+        ctx.fillStyle = 'green';
+        ctx.fillRect(1000,1000,10,10);
+        console.log(canvas.toDataURL());
+        scene.fog = fog;
+        
+    };
+    
     
     this.buildSceneGraph = function() {
         //var texture = fl.getData(config.texture);
@@ -82,7 +125,6 @@ var Level = function(fl) {
             config.texturePath            
         );
         
-        
         var meshLevel = ground.getObject();
         
         
@@ -93,6 +135,7 @@ var Level = function(fl) {
         light.position.z = 1;
         scene.add(meshLevel);
         scene.add(light);
+        THREE.DefaultLoadingManager.onLoad = createMinimap;
         
         this.player.setPosition(
             (config.navigation[0].x+256)%256, 
@@ -107,4 +150,6 @@ var Level = function(fl) {
     };
     
     //buildSceneGraph();    
+   
+
 }

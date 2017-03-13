@@ -153,7 +153,7 @@ var BinModel = function(buffer) {
     if (data[0] === 0x14) {
         console.log("This is a true bin file");
     }
-    vUnit = nUnit / 4;
+    vUnit = nUnit / 8;
     //console.log("scale", data[1]);
     
     for (i=vOffset; i < dOffset; i+=3) {
@@ -179,6 +179,10 @@ var BinModel = function(buffer) {
     //var mesh = new THREE.Mesh(geometry, new THREE.MultiMaterial(materials));
     this.geometry = geometry;
     this.material = materials;
+    
+    geometry.computeBoundingSphere();
+    console.log("box", this.geometry.computeBoundingBox());
+    console.log("sphere", geometry.boundingSphere);
 };
 
 
@@ -308,6 +312,7 @@ var Ground = function(heightArray, textureArray, textures, texturePath) {
         groundGroup.add(new THREE.Mesh(bgeom, material));
         
     }
+
     
 //     groundGroup.position.x = -128;
 //     groundGroup.position.y = -128;
@@ -457,6 +462,9 @@ var Level = function(fl) {
     var fileLoader = fl;
     var models = [];
     this.player = new Player();
+    var renderer;
+    var rt = new THREE.WebGLRenderTarget(1024,1024 ,{type:  THREE.UnsignedByteType, format:THREE.RGBAFormat});
+    
         
     this.init = function(c) {
         config = c;
@@ -480,7 +488,6 @@ var Level = function(fl) {
                 p.push(fl.loadData(c.models[i].file));
             }
         }
-                
         return Promise.all(p);
     };
     
@@ -513,6 +520,47 @@ var Level = function(fl) {
                        
     };
     
+    this.setRenderer = function(r) {
+        renderer = r;
+    };
+
+    
+    
+    var createMinimap = function() {
+        if (renderer === undefined) 
+            return ;
+        
+        var fog = scene.fog.clone();
+        scene.fog = null;
+        
+        var rtcamera = new THREE.OrthographicCamera(-128, 128, 128, -128, -1000, 1000);
+        
+        rtcamera.position.x = 128;
+        rtcamera.position.y = 128;
+        rtcamera.position.z = 0;
+        rtcamera.lookAt(new THREE.Vector3(128,128,-1));
+        //renderer.render(scene, rtcamera);
+        renderer.render(scene, rtcamera, rt);
+        
+        var size = 1024*1024*4;
+        var buffer = new Uint8Array((1024*1024*4)|0);
+
+        renderer.readRenderTargetPixels ( rt, 0, 0, 1024, 1024, buffer );
+        
+        
+        var clampedArray = Uint8ClampedArray.from(buffer);
+
+        
+        var canvas = document.getElementById('minimap');
+        var ctx = canvas.getContext('2d');
+        ctx.putImageData(new ImageData(clampedArray, 1024,1024),0,0);
+        ctx.fillStyle = 'green';
+        ctx.fillRect(1000,1000,10,10);
+        console.log(canvas.toDataURL());
+        scene.fog = fog;
+        
+    };
+    
     
     this.buildSceneGraph = function() {
         //var texture = fl.getData(config.texture);
@@ -532,7 +580,6 @@ var Level = function(fl) {
             config.texturePath            
         );
         
-        
         var meshLevel = ground.getObject();
         
         
@@ -543,6 +590,7 @@ var Level = function(fl) {
         light.position.z = 1;
         scene.add(meshLevel);
         scene.add(light);
+        THREE.DefaultLoadingManager.onLoad = createMinimap;
         
         this.player.setPosition(
             (config.navigation[0].x+256)%256, 
@@ -557,6 +605,8 @@ var Level = function(fl) {
     };
     
     //buildSceneGraph();    
+   
+
 }
 
 
@@ -578,8 +628,10 @@ function RenderManager() {
     };
     
     this.render = function() {
-        renderer.clear();               
+        renderer.clear();    
 
+        document.getElementById("posx").innerHTML = camera.position.x|0;
+        document.getElementById("posy").innerHTML = camera.position.y|0;
         
         // in case we are near a border, we make a two pass rendering
         if (camera.position.x < 20 || camera.position.x > 236 ||
@@ -696,7 +748,7 @@ function RenderManager() {
         }
         
         if (e.key === 'f') {
-            var elem = document.querySelector('canvas');
+            var elem = document.body;
             var fs = elem.requestFullScreen || elem.mozRequestFullScreen || elem.webkitRequestFullScreen ;
             
             if (fs) fs.call(elem);
@@ -768,6 +820,18 @@ function RenderManager() {
         gamepad = e.gamepad;
     };
     
+    this.getRenderer = function() {
+        return renderer;
+    };
+    
+//     var camera = new THREE.OrthographicCamera(-128, 128, 128, -128, -1000, 1000);
+//     
+//     camera.position.x = 128;
+//     camera.position.y = 128;
+//     camera.position.z = 0;
+//     camera.lookAt(new THREE.Vector3(128,128,-1));
+    
+    
     var camera = new THREE.PerspectiveCamera( 45,
                             window.innerWidth/window.innerHeight,0.001,20  );
     camera.position.z = 300 ;
@@ -802,6 +866,7 @@ function main() {
             level.buildSceneGraph();
             renderManager.setScene(level.getScene());
             renderManager.setPlayer(level.player);
+            level.setRenderer(renderManager.getRenderer());
             renderManager.animate();                
         }
     );

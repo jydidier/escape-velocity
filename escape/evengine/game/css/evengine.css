@@ -5,10 +5,43 @@ canvas {
     padding : 0;
 }
 
+
 body {
     margin : 0;
     padding : 0;
     width : 100%;
     height : 100%;
     overflow : hidden;
+    font-family : 'sector', sans-serif;
+    color : white;
+}
+
+
+@font-face {
+    font-family: 'sector';
+    src: url('../font/sector_34.eot');
+    src: url('../font/sector_34.eot?#iefix') format('embedded-opentype'),
+         url('../font/sector_34.woff') format('woff'),
+         url('../font/sector_34.ttf') format('truetype'),
+         url('../font/sector_34.svg#webfont') format('svg');
+}
+
+nav {
+    position: absolute;
+    top: 0px;
+    width: 100%;
+    /*height: 20px;*/
+    text-align: center;
+    z-index: 100;
+    display:block;
+    background-color: navy;
+    opacity: 0.5;
+}
+
+#position {
+    float: right;
+}
+
+#minimap {
+    display: none;
 }

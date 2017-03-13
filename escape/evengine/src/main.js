@@ -16,6 +16,7 @@ function main() {
             level.buildSceneGraph();
             renderManager.setScene(level.getScene());
             renderManager.setPlayer(level.player);
+            level.setRenderer(renderManager.getRenderer());
             renderManager.animate();                
         }
     );

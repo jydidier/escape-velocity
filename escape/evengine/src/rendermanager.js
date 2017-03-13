@@ -17,8 +17,10 @@ function RenderManager() {
     };
     
     this.render = function() {
-        renderer.clear();               
+        renderer.clear();    
 
+        document.getElementById("posx").innerHTML = camera.position.x|0;
+        document.getElementById("posy").innerHTML = camera.position.y|0;
         
         // in case we are near a border, we make a two pass rendering
         if (camera.position.x < 20 || camera.position.x > 236 ||
@@ -135,7 +137,7 @@ function RenderManager() {
         }
         
         if (e.key === 'f') {
-            var elem = document.querySelector('canvas');
+            var elem = document.body;
             var fs = elem.requestFullScreen || elem.mozRequestFullScreen || elem.webkitRequestFullScreen ;
             
             if (fs) fs.call(elem);
@@ -206,6 +208,18 @@ function RenderManager() {
     var registerGamepad = function(e) {
         gamepad = e.gamepad;
     };
+    
+    this.getRenderer = function() {
+        return renderer;
+    };
+    
+//     var camera = new THREE.OrthographicCamera(-128, 128, 128, -128, -1000, 1000);
+//     
+//     camera.position.x = 128;
+//     camera.position.y = 128;
+//     camera.position.z = 0;
+//     camera.lookAt(new THREE.Vector3(128,128,-1));
+    
     
     var camera = new THREE.PerspectiveCamera( 45,
                             window.innerWidth/window.innerHeight,0.001,20  );

@@ -90,7 +90,7 @@ var BinModel = function(buffer) {
     if (data[0] === 0x14) {
         console.log("This is a true bin file");
     }
-    vUnit = nUnit / 4;
+    vUnit = nUnit / 8;
     //console.log("scale", data[1]);
     
     for (i=vOffset; i < dOffset; i+=3) {
@@ -116,6 +116,10 @@ var BinModel = function(buffer) {
     //var mesh = new THREE.Mesh(geometry, new THREE.MultiMaterial(materials));
     this.geometry = geometry;
     this.material = materials;
+    
+    geometry.computeBoundingSphere();
+    console.log("box", this.geometry.computeBoundingBox());
+    console.log("sphere", geometry.boundingSphere);
 };
 
 

@@ -116,6 +116,7 @@ var Ground = function(heightArray, textureArray, textures, texturePath) {
         groundGroup.add(new THREE.Mesh(bgeom, material));
         
     }
+
     
 //     groundGroup.position.x = -128;
 //     groundGroup.position.y = -128;
