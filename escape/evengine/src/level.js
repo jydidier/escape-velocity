@@ -42,7 +42,7 @@ var Level = function(fl) {
     };
         
     this.buildObjects = function() {
-        var i,j,instance,configModel;
+        var i,j,instance,configModel,scale;
         if (config.models === undefined) {
             return ;
         }
@@ -51,6 +51,10 @@ var Level = function(fl) {
                 fl.getData(config.models[i].file)
             );
             models[i].rotation.x = Math.PI/2;
+            scale = 0.5*config.models[i].size / models[i].geometry.boundingSphere.radius;
+            console.log("scale factor:", scale);
+            models[i].scale.x = models[i].scale.y = models[i].scale.z = scale;
+            
             
             configModel = config.models[i]; 
             for(j = 0; j < configModel.places.length; j++) {

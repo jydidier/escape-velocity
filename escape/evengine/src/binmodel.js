@@ -42,7 +42,7 @@ var BinModel = function(buffer) {
                 face.vertices.push( { "vidx" : data[offset+5+j*3], "texcoords" : [data[offset+6+j*3]/tUnit,1- data[offset+7+j*3]/tUnit]});
             }
             faces.push(face);
-            
+            //console.log(faces);
             var tface = new THREE.Face3(
                     face.vertices[0].vidx, 
                     face.vertices[1].vidx, 
@@ -63,6 +63,25 @@ var BinModel = function(buffer) {
 //                 face.vertices[1].texcoords,
 //                 face.vertices[2].texcoords
             ]);
+            
+            if (nv === 4) {
+                var tface2 = new THREE.Face3(
+                        face.vertices[0].vidx, 
+                        face.vertices[2].vidx, 
+                        face.vertices[3].vidx,
+                        new THREE.Vector3(nx, ny, nz),
+                        new THREE.Color(0xffffff),
+                        materialIndex-1
+                    );
+                geometry.faces.push( 
+                    tface2
+                );
+                geometry.faceVertexUvs[0].push( [
+                    new THREE.Vector2(face.vertices[0].texcoords[0],face.vertices[0].texcoords[1]),
+                    new THREE.Vector2(face.vertices[2].texcoords[0],face.vertices[2].texcoords[1]),
+                    new THREE.Vector2(face.vertices[3].texcoords[0],face.vertices[3].texcoords[1])
+                ]);
+            }
            
             
             return offset + 5 + nv*3;
@@ -79,14 +98,15 @@ var BinModel = function(buffer) {
             var textureName = String.fromCharCode.apply(null, str);
             var texture = loader.load(textureName+'.png');
             materials.push(new THREE.MeshLambertMaterial({color: 0xffffff, map : texture}));
-            console.log("texture", texture);
+            //console.log("texture", texture);
             materialIndex++;
             return offset + 5;
         }
     
     };
+    blockDecoders[0x0E] = blockDecoders[0x18];
     
-    
+    console.log(blockDecoders);
     if (data[0] === 0x14) {
         console.log("This is a true bin file");
     }
@@ -95,7 +115,8 @@ var BinModel = function(buffer) {
     
     for (i=vOffset; i < dOffset; i+=3) {
         geometry.vertices.push(
-            new THREE.Vector3(data[i]/vUnit, data[i+1]/vUnit, data[i+2]/vUnit)
+            new THREE.Vector3(data[i]/unit, data[i+1]/unit, data[i+2]/unit)
+            //new THREE.Vector3(data[i]/vUnit, data[i+1]/vUnit, data[i+2]/vUnit)
         );
     }
     
@@ -118,8 +139,8 @@ var BinModel = function(buffer) {
     this.material = materials;
     
     geometry.computeBoundingSphere();
-    console.log("box", this.geometry.computeBoundingBox());
-    console.log("sphere", geometry.boundingSphere);
+//     console.log("box", this.geometry.computeBoundingBox());
+//     console.log("sphere", geometry.boundingSphere);
 };
 
 

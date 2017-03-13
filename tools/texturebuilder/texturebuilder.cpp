@@ -51,17 +51,22 @@ void setupAndSaveImage(QFileInfo fileInfo, const QVector<QRgb>& palette) {
         return;
     }
 
-    if (fileInfo.size() == 64000) {
+    if (fileInfo.size() % 320 == 0) {
         width = 320;
-        height = 200;            
+        height = fileInfo.size()/320;            
     } else {
-        int side = sqrt(fileInfo.size());
-        
-        if (side * side == fileInfo.size()) {
-            width = height = side;
+        if( fileInfo.size() == 27648) {
+            width = 256;
+            height = 108;
         } else {
-            std::cerr << "Cannot handle this texture size." << std::endl;
-            return ;
+            int side = sqrt(fileInfo.size());
+            
+            if (side * side == fileInfo.size()) {
+                width = height = side;
+            } else {
+                std::cerr << "Cannot handle this texture size." << std::endl;
+                return ;
+            }
         }
     }
             

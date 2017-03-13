@@ -28,32 +28,42 @@ function RenderManager() {
             // then we trigger ghost rendering of the scene.
             // in fact, it can add up three more rendering passes
             
+            function reset() {
+                ghostCamera.position.x = camera.position.x;
+                ghostCamera.position.y = camera.position.y;
+            }
+            
             ghostCamera.copy(camera);
             
             if (camera.position.x < 20) {
                 ghostCamera.position.x += 256;                
                 renderer.render(scene, ghostCamera);                
+                reset();
             }
             
             if (camera.position.x > 236) {
                 ghostCamera.position.x -= 256;                
                 renderer.render(scene, ghostCamera);                
+                reset();
             }
             
             if (camera.position.y < 20) {
                 ghostCamera.position.y += 256;                
                 renderer.render(scene, ghostCamera);                
+                reset();
             }
             
             if (camera.position.y > 236) {
                 ghostCamera.position.y -= 256;                
                 renderer.render(scene, ghostCamera);                
+                reset();
             }
             
             if (camera.position.x < 20 && camera.position.y < 20) {
                 ghostCamera.position.x += 256;
                 ghostCamera.position.y += 256;                
                 renderer.render(scene, ghostCamera);                
+                reset();
             }
             
             if (camera.position.x > 236 && camera.position.y > 236) {
@@ -65,7 +75,7 @@ function RenderManager() {
             if (camera.position.x < 20 && camera.position.y > 236) {
                 ghostCamera.position.x += 256;
                 ghostCamera.position.y -= 256;                
-                renderer.render(scene, ghostCamera);                
+                renderer.render(scene, ghostCamera);                                
             }
 
             if (camera.position.x > 236 && camera.position.y < 20) {
