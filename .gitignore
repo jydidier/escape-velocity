@@ -2,4 +2,8 @@
 escape/evengine/game/data/*
 escape/evengine/node_modules/*
 tools/texturebuilder/data/*
+*.user
+*.o
+moc*.cpp
+
 
