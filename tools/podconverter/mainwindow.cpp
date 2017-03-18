@@ -4,6 +4,7 @@
 #include <QTreeView>
 #include <QMessageBox>
 #include <iostream>
+#include <deffile.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -52,9 +53,15 @@ void MainWindow::extract()
 void MainWindow::itemPressed(const QModelIndex &idx)
 {
     if (QApplication::mouseButtons() & Qt::RightButton) {
-        QVariant v = idx.data();
+        QVariant v = idx.data(Qt::UserRole + 1);
         if (v.isValid()) {
-            QMessageBox::information(this, v.toString(), v.toString(), QMessageBox::Ok);
+            QMessageBox::information(this, v.toString(),v.toString(),QMessageBox::Ok);
+            if (v.toString().endsWith(".DEF")) {
+                DefFile df(pod, v.toString());
+                std::cout << qPrintable(df.convert()) << std::endl;
+            }
+
+
         }
 
     }

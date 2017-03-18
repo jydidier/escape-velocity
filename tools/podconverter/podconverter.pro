@@ -7,7 +7,12 @@ QT += widgets
 CONFIG += c++11
 SOURCES += main.cpp \
     mainwindow.cpp \
-    podarchive.cpp
+    podarchive.cpp \
+    deffile.cpp \
+    binfile.cpp \
+    rawfile.cpp \
+    levelfile.cpp \
+    podfile.cpp
 
 # Directories
 
@@ -16,6 +21,16 @@ FORMS += \
 
 HEADERS += \
     mainwindow.h \
-    podarchive.h
+    podarchive.h \
+    deffile.h \
+    binfile.h \
+    rawfile.h \
+    levelfile.h \
+    podfile.h \
+    units.h
 
-STATECHARTS +=
+# not needed anymore in qt5
+#LIBS += -lqjson
+
+MOC_DIR = ./moc
+OBJECTS_DIR = ./obj
