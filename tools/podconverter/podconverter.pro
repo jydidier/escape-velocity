@@ -6,7 +6,8 @@ TEMPLATE = app
 QT += widgets
 CONFIG += c++11
 SOURCES += main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    podarchive.cpp
 
 # Directories
 
@@ -14,6 +15,7 @@ FORMS += \
     mainwindow.ui
 
 HEADERS += \
-    mainwindow.h
+    mainwindow.h \
+    podarchive.h
 
 STATECHARTS +=

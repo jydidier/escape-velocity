@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QScxmlStateMachine>
+#include <podarchive.h>
 
 namespace Ui {
 class MainWindow;
@@ -20,9 +20,13 @@ public:
 private slots:
     void open();
     void quit();
+    void extract();
+    void itemPressed(const QModelIndex& idx);
+
+
 private:
     Ui::MainWindow *ui;
-    QScxmlStateMachine* stateMachine;
+    PodArchive pod;
 };
 
 #endif // MAINWINDOW_H
