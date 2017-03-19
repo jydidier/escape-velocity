@@ -5,6 +5,12 @@
 #include <QMessageBox>
 #include <iostream>
 #include <deffile.h>
+#include <pupfile.h>
+#include <navfile.h>
+#include <texfile.h>
+#include <binfile.h>
+#include <tdffile.h>
+#include <txtfile.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -55,10 +61,33 @@ void MainWindow::itemPressed(const QModelIndex &idx)
     if (QApplication::mouseButtons() & Qt::RightButton) {
         QVariant v = idx.data(Qt::UserRole + 1);
         if (v.isValid()) {
-            QMessageBox::information(this, v.toString(),v.toString(),QMessageBox::Ok);
             if (v.toString().endsWith(".DEF")) {
                 DefFile df(pod, v.toString());
                 std::cout << qPrintable(df.convert()) << std::endl;
+            }
+            if (v.toString().endsWith(".PUP")) {
+                PupFile pf(pod, v.toString());
+                std::cout << qPrintable(pf.convert()) << std::endl;
+            }
+            if (v.toString().endsWith(".NAV")) {
+                NavFile nf(pod, v.toString());
+                std::cout << qPrintable(nf.convert()) << std::endl;
+            }
+            if (v.toString().endsWith(".TEX")) {
+                TexFile tf(pod, v.toString());
+                std::cout << qPrintable(tf.convert()) << std::endl;
+            }
+            if (v.toString().endsWith(".BIN")) {
+                BinFile bf(pod, v.toString());
+                std::cout << qPrintable(bf.dependencies().join(',')) << std::endl;
+            }
+            if (v.toString().endsWith(".TDF")) {
+                TdfFile tf(pod, v.toString());
+                std::cout << qPrintable(tf.convert()) << std::endl;
+            }
+            if (v.toString().endsWith(".TXT")) {
+                TxtFile tf(pod, v.toString());
+                std::cout << qPrintable(tf.convert()) << std::endl;
             }
 
 

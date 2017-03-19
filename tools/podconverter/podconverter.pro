@@ -12,7 +12,13 @@ SOURCES += main.cpp \
     binfile.cpp \
     rawfile.cpp \
     levelfile.cpp \
-    podfile.cpp
+    podfile.cpp \
+    navfile.cpp \
+    pupfile.cpp \
+    texfile.cpp \
+    tdffile.cpp \
+    txtfile.cpp \
+    tnlfile.cpp
 
 # Directories
 
@@ -27,7 +33,13 @@ HEADERS += \
     rawfile.h \
     levelfile.h \
     podfile.h \
-    units.h
+    units.h \
+    navfile.h \
+    pupfile.h \
+    texfile.h \
+    tdffile.h \
+    txtfile.h \
+    tnlfile.h
 
 # not needed anymore in qt5
 #LIBS += -lqjson
