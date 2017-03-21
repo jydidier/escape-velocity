@@ -4,6 +4,8 @@
 #include <QJsonDocument>
 #include <units.h>
 
+int DefFile::fileTypeId = PodFile::registerLoader("DEF", fileLoader<DefFile>);
+
 
 DefFile::DefFile(PodArchive &arch, QString path) : PodFile(arch, path)
 {

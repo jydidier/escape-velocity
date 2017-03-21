@@ -17,6 +17,8 @@ public:
 private:
     QStringList deps;
     QJsonArray objects;
+    static int fileTypeId;
+
 };
 
 #endif // TDFFILE_H

@@ -20,6 +20,9 @@ private:
     void readInstance(QTextStream& ts);
     QJsonArray objects;
     QStringList deps;
+
+    static int fileTypeId;
+
 };
 
 #endif // DEFFILE_H

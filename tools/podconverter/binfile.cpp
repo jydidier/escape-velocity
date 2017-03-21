@@ -3,6 +3,7 @@
 #include <QDataStream>
 #include <iostream>
 
+int BinFile::fileTypeId = PodFile::registerLoader("BIN", fileLoader<BinFile>);
 
 BinFile::BinFile(PodArchive &arch, QString path) : PodFile(arch, path) {
     QDataStream stream(&data, QIODevice::ReadOnly);

@@ -6,6 +6,9 @@
 
 #include <units.h>
 
+int TnlFile::fileTypeId = PodFile::registerLoader("TNL", fileLoader<TnlFile>);
+
+
 TnlFile::TnlFile(PodArchive &arch, QString path) : PodFile(arch, path)
 {
     QTextStream ts(data, QIODevice::ReadOnly);

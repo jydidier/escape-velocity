@@ -6,6 +6,8 @@
 #include <QHash>
 #include <QByteArray>
 
+
+
 class PodArchive
 {
 public:
@@ -17,7 +19,7 @@ public:
 
     QStandardItemModel*  getArchiveModel() { return &archiveModel; }
     QByteArray getFile(QString name);
-
+    QByteArray searchFile(QString name);
 
 private:
     typedef struct {

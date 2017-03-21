@@ -4,6 +4,9 @@
 #include <units.h>
 #include <QJsonDocument>
 
+int NavFile::fileTypeId = PodFile::registerLoader("NAV", fileLoader<NavFile>);
+
+
 NavFile::NavFile(PodArchive &arch, QString path) : PodFile(arch, path)
 {
     QTextStream ts(data,QIODevice::ReadOnly);

@@ -19,6 +19,7 @@ private:
 
     QStringList deps;
 
+    static int fileTypeId;
 };
 
 #endif // BINFILE_H

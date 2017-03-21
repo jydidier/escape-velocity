@@ -5,6 +5,8 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 
+int PupFile::fileTypeId = PodFile::registerLoader("PUP", fileLoader<PupFile>);
+
 
 PupFile::PupFile(PodArchive &arch, QString path) : PodFile(arch, path)
 {

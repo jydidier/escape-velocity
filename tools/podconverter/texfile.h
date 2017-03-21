@@ -16,6 +16,9 @@ public:
 private:
     QStringList deps;
 
+    static int fileTypeId;
+
+
 
 };
 

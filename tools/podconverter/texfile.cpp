@@ -3,6 +3,9 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 
+int TexFile::fileTypeId = PodFile::registerLoader("TEX", fileLoader<TexFile>);
+
+
 TexFile::TexFile(PodArchive &arch, QString path) : PodFile(arch,path)
 {
     QTextStream ts(data,QIODevice::ReadOnly);

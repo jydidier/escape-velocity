@@ -27,6 +27,9 @@ private:
     QJsonArray objects;
     QStringList deps;
 
+    static int fileTypeId;
+
+
 };
 
 #endif // NAVFILE_H

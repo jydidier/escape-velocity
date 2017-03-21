@@ -16,6 +16,9 @@ private:
     QJsonObject briefing;
     QString model;
     QString texture;
+
+    static int fileTypeId;
+
 };
 
 #endif // TXTFILE_H

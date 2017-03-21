@@ -12,6 +12,7 @@
 #include <tdffile.h>
 #include <txtfile.h>
 #include <tnlfile.h>
+#include <levelfile.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -93,6 +94,10 @@ void MainWindow::itemPressed(const QModelIndex &idx)
             if (v.toString().endsWith(".TNL")) {
                 TnlFile tf(pod, v.toString());
                 std::cout << qPrintable(tf.convert()) << std::endl;
+            }
+            if (v.toString().endsWith(".LVL")) {
+                LevelFile lf(pod, v.toString());
+                std::cout << qPrintable(lf.convert()) << std::endl;
             }
 
 

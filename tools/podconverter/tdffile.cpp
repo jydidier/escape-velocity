@@ -5,6 +5,9 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 
+int TdfFile::fileTypeId = PodFile::registerLoader("TDF", fileLoader<TdfFile>);
+
+
 TdfFile::TdfFile(PodArchive &arch, QString path) : PodFile(arch, path)
 {
     QTextStream ts(data, QIODevice::ReadOnly);

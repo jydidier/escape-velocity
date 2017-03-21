@@ -15,7 +15,11 @@ public:
 
 private:
     QStringList deps;
+    QString paletteFile ;
     QJsonObject level;
+
+    static int fileTypeId;
+
 };
 
 #endif // LEVELFILE_H

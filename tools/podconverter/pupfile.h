@@ -13,6 +13,9 @@ public:
 private:
     QJsonArray objects;
 
+    static int fileTypeId;
+
+
 };
 
 #endif // PUPFILE_H

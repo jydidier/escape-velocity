@@ -15,6 +15,9 @@ public:
 private:
     QJsonArray segments;
 
+    static int fileTypeId;
+
+
 };
 
 #endif // TNLFILE_H

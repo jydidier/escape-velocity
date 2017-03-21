@@ -80,6 +80,18 @@ QByteArray PodArchive::getFile(QString name)
     return file.read(fe.filesize);
 }
 
+QByteArray PodArchive::searchFile(QString name)
+{
+    QStringList sl = archiveEntries.keys();
+
+    for (QString s: sl) {
+        if (s.endsWith(name)) {
+            return getFile(s);
+        }
+    }
+    return QByteArray();
+}
+
 
 void PodArchive::decode() {
     if (!file.isOpen())
