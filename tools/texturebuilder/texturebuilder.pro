@@ -6,6 +6,7 @@ TEMPLATE = app
 TARGET = 
 DEPENDPATH += .
 INCLUDEPATH += .
+HEADERS += texturebuilder.h
 
 # Input
 SOURCES += texturebuilder.cpp

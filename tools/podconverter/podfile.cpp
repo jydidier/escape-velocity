@@ -1,7 +1,7 @@
 #include "podfile.h"
+#include <iostream>
 
 int PodFile::fileTypeId = 0;
-QHash<QString,std::function<PodFile*(PodArchive&, QString)> > PodFile::loaders;
 
 
 PodFile::PodFile(PodArchive &arch, QString path) :
@@ -23,6 +23,9 @@ QStringList PodFile::getAllDependencies()
 
 int PodFile::registerLoader(QString ext, std::function<PodFile *(PodArchive &, QString)> cst)
 {
-    loaders[ext] = cst;
-    return loaders.size();
+
+    loaders()[ext] = cst;
+    //std::cout << "registered loaders: " << loaders->size() << std::endl;
+
+    return loaders().size();
 }

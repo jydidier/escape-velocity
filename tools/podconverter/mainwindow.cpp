@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <texturedialog.h>
+
 #include <QFileDialog>
 #include <QTreeView>
 #include <QMessageBox>
@@ -12,6 +14,8 @@
 #include <tdffile.h>
 #include <txtfile.h>
 #include <tnlfile.h>
+#include <rawfile.h>
+#include <actfile.h>
 #include <levelfile.h>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -98,6 +102,13 @@ void MainWindow::itemPressed(const QModelIndex &idx)
             if (v.toString().endsWith(".LVL")) {
                 LevelFile lf(pod, v.toString());
                 std::cout << qPrintable(lf.convert()) << std::endl;
+            }
+
+            if (v.toString().endsWith(".RAW")) {
+                RawFile rf(pod, v.toString());
+                TextureDialog td(this);
+                td.exec();
+
             }
 
 

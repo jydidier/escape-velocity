@@ -10,7 +10,7 @@ public:
     TnlFile(PodArchive& arch, QString path);
 
     virtual QByteArray convert();
-    virtual const QStringList dependencies();
+    //virtual const QStringList dependencies();
 
 private:
     QJsonArray segments;

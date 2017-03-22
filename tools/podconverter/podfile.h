@@ -29,7 +29,11 @@ protected:
     QByteArray data;
 
 private:
-    static QHash<QString,std::function<PodFile*(PodArchive&, QString)> > loaders;
+    static QHash<QString,std::function<PodFile*(PodArchive&, QString)> >& loaders() {
+        static QHash<QString,std::function<PodFile*(PodArchive&, QString)> >* res = new  QHash<QString,std::function<PodFile*(PodArchive&, QString)> >();
+        return *res;
+    }
+
     static int fileTypeId;
 };
 

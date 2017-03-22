@@ -81,7 +81,7 @@ QByteArray TnlFile::convert()
     return doc.toJson();
 }
 
-const QStringList TnlFile::dependencies()
+/*const QStringList TnlFile::dependencies()
 {
 
-}
+}*/
