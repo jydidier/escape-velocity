@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,1,0">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0">
    <item>
     <widget class="QFrame" name="frame">
      <property name="frameShape">
@@ -40,7 +40,11 @@
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="textureWidget" native="true"/>
+    <widget class="QLabel" name="textureWidget">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
@@ -88,5 +92,24 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>paletteList</sender>
+   <signal>activated(QString)</signal>
+   <receiver>TextureDialog</receiver>
+   <slot>changePalette(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>199</x>
+     <y>49</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
+ <slots>
+  <slot>changePalette(QString)</slot>
+ </slots>
 </ui>

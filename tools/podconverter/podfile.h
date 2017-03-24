@@ -22,6 +22,7 @@ public:
     QStringList getAllDependencies();
 
     static int registerLoader(QString ext,std::function<PodFile*(PodArchive&, QString)> cst);
+    PodArchive& getArchive() { return archive; }
 
 
 protected:

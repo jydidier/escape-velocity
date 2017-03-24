@@ -106,14 +106,12 @@ void MainWindow::itemPressed(const QModelIndex &idx)
 
             if (v.toString().endsWith(".RAW")) {
                 RawFile rf(pod, v.toString());
-                TextureDialog td(this);
-                td.exec();
+                TextureDialog td(rf,this);
+                if (td.exec() == QDialog::Accepted) {
 
+                }
             }
-
-
         }
-
     }
 }
 

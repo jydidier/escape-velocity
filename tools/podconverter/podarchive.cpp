@@ -3,6 +3,7 @@
 #include <QIcon>
 #include <QDir>
 #include <QList>
+#include <QRegExp>
 
 PodArchive::PodArchive(QString fileName)
 {
@@ -59,6 +60,21 @@ void PodArchive::extractFile(QString entry, QString fileName)
         return ;
     }
     file.write(getFile(entry));
+}
+
+QStringList PodArchive::findFiles(QString pattern)
+{
+    QStringList sl = archiveEntries.keys();
+    QRegExp re(pattern);
+    re.setPatternSyntax(QRegExp::Wildcard);
+    QStringList res;
+
+    for(QString s : sl) {
+        if (re.exactMatch(s))
+            res << s;
+    }
+
+    return res;
 }
 
 

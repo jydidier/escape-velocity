@@ -16,6 +16,7 @@ public:
     void setFileName(QString fileName);
     void extractTo(QString dirname);
     void extractFile(QString entry, QString fileName );
+    QStringList findFiles(QString pattern);
 
     QStandardItemModel*  getArchiveModel() { return &archiveModel; }
     QByteArray getFile(QString name);

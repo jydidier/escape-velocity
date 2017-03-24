@@ -27,7 +27,7 @@ RawFile::RawFile(PodArchive &arch, QString path) : PodFile(arch, path)
     }
 
     if (width > 0 && height > 0) {
-        std::cout << width << "x" << height << ": " << length << std::endl;
+        //std::cout << width << "x" << height << ": " << length << std::endl;
         image = QImage(width,height,QImage::Format_Indexed8);
         QVector<QRgb> palette;
         for(int i=0; i < 256; i++) {
