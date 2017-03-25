@@ -10,7 +10,13 @@ public:
     TxtFile(PodArchive& arch, QString path);
 
     virtual QByteArray convert();
-    virtual const QStringList dependencies() { return QStringList() << model << texture; }
+    virtual QStringList dependencies() {
+        QStringList lst;
+        lst << model << texture;
+        return lst;
+    }
+
+    virtual QJsonValue toJson() { return briefing; }
 
 private:
     QJsonObject briefing;

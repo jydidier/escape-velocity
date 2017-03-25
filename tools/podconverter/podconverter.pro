@@ -20,13 +20,16 @@ SOURCES += main.cpp \
     txtfile.cpp \
     tnlfile.cpp \
     actfile.cpp \
-    texturedialog.cpp
+    texturedialog.cpp \
+    palettewidget.cpp \
+    palettedialog.cpp
 
 # Directories
 
 FORMS += \
     mainwindow.ui \
-    texturedialog.ui
+    texturedialog.ui \
+    palettedialog.ui
 
 HEADERS += \
     mainwindow.h \
@@ -44,7 +47,9 @@ HEADERS += \
     txtfile.h \
     tnlfile.h \
     actfile.h \
-    texturedialog.h
+    texturedialog.h \
+    palettewidget.h \
+    palettedialog.h
 
 # not needed anymore in qt5
 #LIBS += -lqjson

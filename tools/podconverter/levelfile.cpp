@@ -52,8 +52,12 @@ LevelFile::LevelFile(PodArchive &arch, QString path) : PodFile(arch, path)
     deps << line;
     level["placement"] = line = ts.readLine();
     deps << line;
-    level["navigation"] = line = ts.readLine();
-    deps << line;
+
+    line = ts.readLine();
+    if (type == 4) {
+        level["navigation"] = line ;
+        deps << line;
+    }
     level["music"] = line = ts.readLine();
 
     // for reading fog
@@ -86,7 +90,7 @@ QByteArray LevelFile::convert()
     return doc.toJson();
 }
 
-const QStringList LevelFile::dependencies()
+QStringList LevelFile::dependencies()
 {
     return deps;
 }

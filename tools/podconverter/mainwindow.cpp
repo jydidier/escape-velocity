@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <texturedialog.h>
+#include <palettedialog.h>
 
 #include <QFileDialog>
 #include <QTreeView>
@@ -17,6 +18,7 @@
 #include <rawfile.h>
 #include <actfile.h>
 #include <levelfile.h>
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -102,13 +104,22 @@ void MainWindow::itemPressed(const QModelIndex &idx)
             if (v.toString().endsWith(".LVL")) {
                 LevelFile lf(pod, v.toString());
                 std::cout << qPrintable(lf.convert()) << std::endl;
+                std::cout << qPrintable(lf.getAllDependencies().join(',')) << std::endl;
             }
-
+            if (v.toString().endsWith(".ACT")) {
+                ActFile af(pod,v.toString());
+                PaletteDialog pd(af.getPalette(), this);
+                pd.exec();
+            }
             if (v.toString().endsWith(".RAW")) {
                 RawFile rf(pod, v.toString());
                 TextureDialog td(rf,this);
                 if (td.exec() == QDialog::Accepted) {
-
+                    QString fn = QFileDialog::getSaveFileName(this,
+                            QString("Please select a file to save texture"),QString(), QString("Png Image (*.png);; Jpeg Image (*.jpg)"));
+                    if (!fn.isEmpty()) {
+                        rf.getImage().save(fn);
+                    }
                 }
             }
         }

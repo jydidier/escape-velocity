@@ -11,7 +11,8 @@ public:
     LevelFile(PodArchive& arch, QString path);
 
     virtual QByteArray convert();
-    virtual const QStringList dependencies();
+    virtual QStringList dependencies();
+    virtual QJsonValue toJson() { return level; }
 
 private:
     QStringList deps;

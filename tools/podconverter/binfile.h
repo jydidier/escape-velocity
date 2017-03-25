@@ -9,7 +9,7 @@ public:
     BinFile(PodArchive& arch, QString path);
 
     virtual QByteArray convert() { return data; }
-    virtual const QStringList dependencies() { return deps; }
+    virtual QStringList dependencies() { return deps; }
 
 private:
     void readAnimation(QDataStream& stream);

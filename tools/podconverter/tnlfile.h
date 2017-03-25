@@ -11,6 +11,8 @@ public:
 
     virtual QByteArray convert();
     //virtual const QStringList dependencies();
+    virtual QJsonValue toJson() { return segments; }
+
 
 private:
     QJsonArray segments;

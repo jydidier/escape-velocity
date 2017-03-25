@@ -66,7 +66,8 @@ QStringList PodArchive::findFiles(QString pattern)
 {
     QStringList sl = archiveEntries.keys();
     QRegExp re(pattern);
-    re.setPatternSyntax(QRegExp::Wildcard);
+    re.setCaseSensitivity(Qt::CaseInsensitive);
+    re.setPatternSyntax(QRegExp::WildcardUnix);
     QStringList res;
 
     for(QString s : sl) {

@@ -13,14 +13,15 @@ public:
     explicit NavFile(PodArchive& arch, QString path);
 
     virtual QByteArray convert();
-    virtual const QStringList dependencies() { return deps; }
+    virtual QStringList dependencies() { return deps; }
+    virtual QJsonValue toJson() { return objects; }
 
 private:
     void readTarget(QTextStream& ts, QJsonObject& obj);
     void readTunnel(QTextStream& ts, QJsonObject& obj);
     //QJsonObject readCheckpoint();
     //QJsonObject readDepartureUnit();
-    void readTunnelExit(QTextStream& ts, QJsonObject& obj);
+    void readTunnelExit(QTextStream& ts, QJsonObject&);
     void readBoss(QTextStream& ts, QJsonObject& obj);
     void readStartingPoint(QTextStream& ts, QJsonObject& obj);
 

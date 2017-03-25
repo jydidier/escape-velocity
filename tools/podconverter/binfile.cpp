@@ -39,7 +39,6 @@ void BinFile::readAnimation(QDataStream &stream)
 void BinFile::readModel(QDataStream &stream)
 {
     int discard, numVertices, blockNumber;
-    uint length;
 
     // processing header
     stream >> discard >> discard >> discard >> numVertices;

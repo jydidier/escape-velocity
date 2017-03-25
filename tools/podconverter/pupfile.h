@@ -9,6 +9,7 @@ class PupFile : public PodFile
 public:
     PupFile(PodArchive& arch, QString path);
     virtual QByteArray convert();
+    virtual QJsonValue toJson() { return objects; }
 
 private:
     QJsonArray objects;

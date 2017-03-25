@@ -76,7 +76,7 @@ void NavFile::readTunnel(QTextStream &ts, QJsonObject &obj)
     deps << filename;
 }
 
-void NavFile::readTunnelExit(QTextStream &ts, QJsonObject &obj)
+void NavFile::readTunnelExit(QTextStream &ts, QJsonObject &)
 {
     ts.readLine();
     ts.readLine();

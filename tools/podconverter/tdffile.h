@@ -12,7 +12,8 @@ public:
     TdfFile(PodArchive& arch, QString path);
 
     virtual QByteArray convert();
-    virtual const QStringList dependencies() { return deps; }
+    virtual QStringList dependencies() { return deps; }
+    virtual QJsonValue toJson() { return objects; }
 
 private:
     QStringList deps;
