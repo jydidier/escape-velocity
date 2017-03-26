@@ -23,6 +23,8 @@ public:
     }
     virtual QJsonValue toJson() { return QJsonValue(); }
 
+    virtual void convertAndExport(QString name);
+
     QStringList getAllDependencies();
 
     static int registerLoader(QString ext,std::function<PodFile*(PodArchive&, QString)> cst);

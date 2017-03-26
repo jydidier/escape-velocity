@@ -33,11 +33,26 @@
     <property name="title">
      <string>File</string>
     </property>
+    <widget class="QMenu" name="menuRecentPods">
+     <property name="title">
+      <string>Recent pods</string>
+     </property>
+    </widget>
     <addaction name="actionOpen"/>
+    <addaction name="menuRecentPods"/>
     <addaction name="actionExtract"/>
     <addaction name="actionQuit"/>
    </widget>
+   <widget class="QMenu" name="menuEntry">
+    <property name="title">
+     <string>Entry</string>
+    </property>
+    <addaction name="actionExtractFile"/>
+    <addaction name="actionExport"/>
+    <addaction name="actionExportLevel"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuEntry"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -50,20 +65,61 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionOpen"/>
+   <addaction name="actionExtract"/>
+   <addaction name="separator"/>
+   <addaction name="actionExtractFile"/>
+   <addaction name="actionExport"/>
+   <addaction name="actionExportLevel"/>
+   <addaction name="separator"/>
+   <addaction name="actionQuit"/>
   </widget>
   <action name="actionOpen">
+   <property name="icon">
+    <iconset theme="document-open"/>
+   </property>
    <property name="text">
     <string>Open</string>
    </property>
   </action>
   <action name="actionQuit">
+   <property name="icon">
+    <iconset theme="system-shutdown"/>
+   </property>
    <property name="text">
     <string>Quit</string>
    </property>
   </action>
   <action name="actionExtract">
+   <property name="icon">
+    <iconset theme="document-save"/>
+   </property>
    <property name="text">
     <string>Extract</string>
+   </property>
+  </action>
+  <action name="actionExtractFile">
+   <property name="icon">
+    <iconset theme="go-next"/>
+   </property>
+   <property name="text">
+    <string>Extract...</string>
+   </property>
+  </action>
+  <action name="actionExport">
+   <property name="icon">
+    <iconset theme="go-last"/>
+   </property>
+   <property name="text">
+    <string>Export...</string>
+   </property>
+  </action>
+  <action name="actionExportLevel">
+   <property name="icon">
+    <iconset theme="document-properties"/>
+   </property>
+   <property name="text">
+    <string>Export level...</string>
    </property>
   </action>
  </widget>
@@ -117,11 +173,62 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionExport</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>exportItem()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionExtractFile</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>extractItem()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionExportLevel</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>exportLevel()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>open()</slot>
   <slot>quit()</slot>
   <slot>closePod()</slot>
   <slot>extract()</slot>
+  <slot>exportItem()</slot>
+  <slot>extractItem()</slot>
+  <slot>exportLevel()</slot>
  </slots>
 </ui>

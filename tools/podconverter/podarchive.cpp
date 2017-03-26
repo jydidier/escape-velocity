@@ -18,12 +18,13 @@ PodArchive::PodArchive(QString fileName)
 
 
 void PodArchive::setFileName(QString fileName) {
+    if (file.isOpen())
+        file.close();
+
     file.setFileName(fileName);
     file.open(QFile::ReadOnly);
     decode();
 }
-
-
 
 
 void PodArchive::extractTo(QString dirname)
@@ -60,7 +61,9 @@ void PodArchive::extractFile(QString entry, QString fileName)
         return ;
     }
     file.write(getFile(entry));
+    file.close();
 }
+
 
 QStringList PodArchive::findFiles(QString pattern)
 {
@@ -100,9 +103,11 @@ QByteArray PodArchive::getFile(QString name)
 QByteArray PodArchive::searchFile(QString name)
 {
     QStringList sl = archiveEntries.keys();
+    name = name.toUpper();
 
     for (QString s: sl) {
         if (s.endsWith(name)) {
+            std::cout << qPrintable(name) << std::endl;
             return getFile(s);
         }
     }
@@ -128,7 +133,6 @@ void PodArchive::decode() {
     cnames << "name" << "size" << "offset";
     archiveModel.setHorizontalHeaderLabels(cnames);
 
-
     for (unsigned int i=0; i < header.numfiles; i++) {
         file.read((char*)(&entries[i]), sizeof(PodFileEntry));
         addEntry(entries[i]);
@@ -141,7 +145,6 @@ void PodArchive::addEntry(const PodArchive::PodFileEntry &entry)
 {
     QStandardItem* parentItem = archiveModel.invisibleRootItem();
     QString filePath(entry.filepath);
-
 
     QStringList sl = filePath.split('\\');
 

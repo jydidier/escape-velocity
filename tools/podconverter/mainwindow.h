@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <podarchive.h>
+#include <QSettings>
+#include <QModelIndex>
 
 namespace Ui {
 class MainWindow;
@@ -23,10 +25,22 @@ private slots:
     void extract();
     void itemPressed(const QModelIndex& idx);
 
+    void extractItem();
+    void exportItem();
+    void exportLevel();
+
+
 
 private:
+    void updateRecentMenu();
+    void updateRecentSettings(QString doc);
+    void open(QString podName);
+
+
     Ui::MainWindow *ui;
     PodArchive pod;
+    QSettings settings;
+    QModelIndex currentItem;
 };
 
 #endif // MAINWINDOW_H

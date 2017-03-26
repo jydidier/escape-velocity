@@ -14,6 +14,8 @@ public:
     virtual QStringList dependencies();
     virtual QJsonValue toJson() { return level; }
 
+    void exportLevel(QString dir);
+
 private:
     QStringList deps;
     QString paletteFile ;

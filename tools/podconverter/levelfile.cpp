@@ -4,7 +4,14 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <units.h>
-
+#include <iostream>
+#include <txtfile.h>
+#include <texfile.h>
+#include <pupfile.h>
+#include <tdffile.h>
+#include <deffile.h>
+#include <navfile.h>
+#include <tnlfile.h>
 
 int LevelFile::fileTypeId = PodFile::registerLoader("LVL", fileLoader<LevelFile>);
 
@@ -40,7 +47,7 @@ LevelFile::LevelFile(PodArchive &arch, QString path) : PodFile(arch, path)
     // for reading qke
     ts.readLine();
 
-    level["powerup"] = line = ts.readLine();
+    level["powerups"] = line = ts.readLine();
     deps << line;
     level["animation"] = line = ts.readLine();
     deps << line;
@@ -93,4 +100,75 @@ QByteArray LevelFile::convert()
 QStringList LevelFile::dependencies()
 {
     return deps;
+}
+
+void LevelFile::exportLevel(QString dir)
+{
+    QStringList allDeps = getAllDependencies();
+    QStringList foundFiles;
+    // first, we will finalize level file
+
+    // let's do briefing
+    foundFiles = archive.findFiles("*"+level["briefing"].toString());
+    TxtFile txtf(archive, foundFiles[0]);
+    level["briefing"] = txtf.toJson();
+    allDeps.removeAll(foundFiles[0]);
+
+    foundFiles = archive.findFiles("*"+level["textures"].toString());
+    TexFile texf(archive, foundFiles[0]);
+    level["textures"] = texf.toJson();
+    allDeps.removeAll(foundFiles[0]);
+
+    foundFiles = archive.findFiles("*"+level["powerups"].toString());
+    PupFile pupf(archive, foundFiles[0]);
+    level["powerups"] = pupf.toJson();
+    allDeps.removeAll(foundFiles[0]);
+
+    foundFiles = archive.findFiles("*"+level["tunnel_definition"].toString());
+    TdfFile tdff(archive, foundFiles[0]);
+    level["tunnel_definition"] = tdff.toJson();
+    allDeps.removeAll(foundFiles[0]);
+
+    foundFiles = archive.findFiles("*"+level["placement"].toString());
+    DefFile deff(archive, foundFiles[0]);
+    level["placement"] = deff.toJson();
+    allDeps.removeAll(foundFiles[0]);
+
+    if (!level["navigation"].isUndefined()) {
+        foundFiles = archive.findFiles("*"+level["navigation"].toString());
+        NavFile navf(archive, foundFiles[0]);
+        level["navigation"] = navf.toJson();
+        allDeps.removeAll(foundFiles[0]);
+    }
+
+    if (!level["tunnel"].isUndefined()) {
+        foundFiles = archive.findFiles("*"+level["tunnel"].toString());
+        TnlFile tnlf(archive, foundFiles[0]);
+        level["tunnel"] = tnlf.toJson();
+        allDeps.removeAll(foundFiles[0]);
+    }
+
+    QFile file(dir);
+    if (file.open(QFile::WriteOnly)) {
+        QJsonDocument doc(level);
+        file.write(doc.toJson());
+        file.close();
+    }
+
+    std::cout << qPrintable(allDeps.join(',')) << std::endl;
+
+    for(QString fn : allDeps) {
+        if (fn.endsWith("RAW")) {
+            // here we will extract raw files
+            // we shall use palette for this.
+
+        } else {
+            // we will ignore level files
+            if (!fn.endsWith("LVL")) {
+
+            }
+        }
+
+    }
+
 }

@@ -14,7 +14,6 @@ DefFile::DefFile(PodArchive &arch, QString path) : PodFile(arch, path)
     int numObjects, numInstances ;
 
     numObjects = ts.readLine().toInt();
-    std::cout << "starting to parse def file" << numObjects << std::endl;
 
     for (int i=0; i < numObjects; i++) {
         objects << readObject(ts);
@@ -30,7 +29,7 @@ DefFile::DefFile(PodArchive &arch, QString path) : PodFile(arch, path)
 QByteArray DefFile::convert()
 {
     QJsonDocument doc(objects);
-    return doc.toJson(QJsonDocument::Compact);
+    return doc.toJson(QJsonDocument::Indented);
 }
 
 
@@ -51,7 +50,10 @@ void DefFile::readInstance(QTextStream &ts) {
                 << sl[3].toFloat() / DISTANCE_UNIT
                 << sl[4].toFloat() / DISTANCE_UNIT);
     instance["rotation"] =
-            (QJsonArray() << sl[5].toInt() << sl[6].toInt() << sl[7].toInt());
+            (QJsonArray() << sl[5].toInt() / ANGLE_UNIT
+                << sl[6].toInt() / ANGLE_UNIT
+                << sl[7].toInt() / ANGLE_UNIT
+    );
     instances << instance;
 
     obj["instances"] = instances;
@@ -96,7 +98,7 @@ QJsonObject DefFile::readObject(QTextStream &ts)
         return QJsonObject();
     obj["thrust_speed"] = sl[0].toInt();
     obj["rotation_speed"] = sl[1].toFloat() / ANGLE_UNIT;
-    obj["fire_speed"] = sl[2].toInt();
+    obj["fire_speed"] = sl[2].toInt()/DISTANCE_UNIT;
     obj["fire_strength"] = sl[3].toInt();
     obj["weapon"] = sl[4].toInt();
 
@@ -158,7 +160,7 @@ QJsonObject DefFile::readObject(QTextStream &ts)
     obj["fire_spread"] = sl[0].toInt();
     obj["sec_wpn"] = sl[1].toInt();
     obj["sec_wpn_dist"] = sl[2].toInt();
-    obj["fire_velocity"] = sl[3].toInt();
+    obj["fire_velocity"] = sl[3].toInt() / DISTANCE_UNIT;
 
     // last lines
     ts.readLine();
