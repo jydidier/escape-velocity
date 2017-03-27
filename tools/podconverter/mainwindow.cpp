@@ -29,6 +29,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->menuEntry->setEnabled(false);
+    ui->actionExportLevel->setEnabled(false);
+    ui->actionExport->setEnabled(false);
+    ui->actionExtractFile->setEnabled(false);
 
     QObject::connect(ui->treeView, &QTreeView::pressed, this, &MainWindow::itemPressed);
     updateRecentMenu();
@@ -67,14 +70,24 @@ void MainWindow::extract()
 
 void MainWindow::itemPressed(const QModelIndex &idx)
 {
-    ui->menuEntry->setEnabled(true);
     currentItem = idx;
 
     QString entry = idx.data(Qt::UserRole + 1).toString();
-    QString ext = entry.right(3).toLower();
 
-    ui->actionExportLevel->setEnabled(ext == "lvl");
+    if (entry.isEmpty()) {
+        ui->menuEntry->setEnabled(false);
+        ui->actionExportLevel->setEnabled(false);
+        ui->actionExport->setEnabled(false);
+        ui->actionExtractFile->setEnabled(false);
+    } else {
+        QString ext = entry.right(3).toLower();
 
+        ui->menuEntry->setEnabled(true);
+
+        ui->actionExportLevel->setEnabled(ext == "lvl");
+        ui->actionExport->setEnabled(true);
+        ui->actionExtractFile->setEnabled(true);
+    }
 }
 
 
@@ -202,10 +215,10 @@ void MainWindow::updateRecentSettings(QString doc)
     }
 
     if (sl.count() > 4) {
-        sl.takeFirst();
+        sl.takeLast();
     }
 
-    sl.append(doc);
+    sl.prepend(doc);
     settings.setValue("recent",sl);
 }
 

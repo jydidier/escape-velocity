@@ -21,7 +21,7 @@ TdfFile::TdfFile(PodArchive &arch, QString path) : PodFile(arch, path)
         QString levelFile;
         levelFile =  ts.readLine();
         deps << levelFile;
-        tunnel["level_file"] = levelFile;
+        tunnel["levelFile"] = levelFile;
 
         QJsonObject entrance;
         QJsonObject exit;
@@ -46,13 +46,13 @@ TdfFile::TdfFile(PodArchive &arch, QString path) : PodFile(arch, path)
         ts.readLine();
 
         QString texture = ts.readLine();
-        entrance["terrain_texture"] = texture;
+        entrance["groundTexture"] = texture;
         deps << texture;
         exit["logic"] = ts.readLine().toInt();
         ts.readLine();
 
         texture = ts.readLine();
-        exit["terrain_texture"] = texture;
+        exit["groundTexture"] = texture;
         deps << texture;
         exit["chamber"] = ts.readLine().toInt() != 0;
 

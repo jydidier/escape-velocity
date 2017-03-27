@@ -18,7 +18,8 @@ public:
 
 private:
     QStringList deps;
-    QString paletteFile ;
+    QString paletteFile;
+    QString backgroundPaletteFile;
     QJsonObject level;
     QString filePath;
 

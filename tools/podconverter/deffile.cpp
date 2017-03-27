@@ -77,11 +77,11 @@ QJsonObject DefFile::readObject(QTextStream &ts)
     if (sl.count() != 8)
         return QJsonObject();
     obj["logic"] = sl[0].toInt();
-    obj["bbox_radius"] = sl[2].toFloat() / DISTANCE_UNIT;
+    obj["radius"] = sl[2].toFloat() / DISTANCE_UNIT;
     obj["center"] = (QJsonArray() <<  sl[3].toFloat()/DISTANCE_UNIT
             << sl[4].toFloat()/DISTANCE_UNIT << sl[5].toFloat()/DISTANCE_UNIT);
-    obj["complex_model"] = sl[6];
-    obj["simple_model"] = sl[7];
+    obj["fullModel"] = sl[6];
+    obj["simpleModel"] = sl[7];
 
     if (!deps.contains(sl[6])) {
         deps << sl[6];
@@ -96,10 +96,10 @@ QJsonObject DefFile::readObject(QTextStream &ts)
     sl = line.split(',');
     if (sl.count() != 5)
         return QJsonObject();
-    obj["thrust_speed"] = sl[0].toInt();
-    obj["rotation_speed"] = sl[1].toFloat() / ANGLE_UNIT;
-    obj["fire_speed"] = sl[2].toInt()/DISTANCE_UNIT;
-    obj["fire_strength"] = sl[3].toInt();
+    obj["thrustSpeed"] = sl[0].toInt() / DISTANCE_UNIT;
+    obj["rotationSpeed"] = sl[1].toFloat() / ANGLE_UNIT;
+    obj["fireSpeed"] = sl[2].toInt()/DISTANCE_UNIT;
+    obj["fireStrength"] = sl[3].toInt();
     obj["weapon"] = sl[4].toInt();
 
     // third line
@@ -107,9 +107,9 @@ QJsonObject DefFile::readObject(QTextStream &ts)
     sl = line.split(',');
     if (sl.count() != 4)
         return QJsonObject();
-    obj["show_on_briefing"] = sl[0].toInt() != 0;
-    obj["create_randomly"] = sl[1].toInt();
-    obj["powerup_probability"] = sl[2].toInt();
+    obj["showOnBriefing"] = sl[0].toInt() != 0;
+    obj["createRandomly"] = sl[1].toInt();
+    obj["powerupProbability"] = sl[2].toInt();
     obj["powerup"] = sl[3].toInt();
 
     // fourth line
@@ -124,7 +124,7 @@ QJsonObject DefFile::readObject(QTextStream &ts)
     for (int i = 0; i < ((num_rnd_fire_verts>8)?8:num_rnd_fire_verts) ; i++) {
         fire_verts << sl[i+1].toInt();
     }
-    obj["fire_verts"] = fire_verts;
+    obj["fireVerts"] = fire_verts;
 
     // fifth significative line
     ts.readLine();
@@ -145,9 +145,9 @@ QJsonObject DefFile::readObject(QTextStream &ts)
     sl = line.split(',');
     if (sl.count() != 4)
         return QJsonObject();
-    obj["attack_dist"] = sl[0].toInt();
-    obj["retreat_dist"] = sl[1].toInt();
-    obj["object_is_boss"] = sl[2].toInt() !=0;
+    obj["attackDist"] = sl[0].toInt();
+    obj["retreatDist"] = sl[1].toInt();
+    obj["objectIsBoss"] = sl[2].toInt() !=0;
 
     obj["description"] = ts.readLine();
 
@@ -157,15 +157,15 @@ QJsonObject DefFile::readObject(QTextStream &ts)
     sl = line.split(',');
     if (sl.count() != 4)
         return QJsonObject();
-    obj["fire_spread"] = sl[0].toInt();
-    obj["sec_wpn"] = sl[1].toInt();
-    obj["sec_wpn_dist"] = sl[2].toInt();
-    obj["fire_velocity"] = sl[3].toInt() / DISTANCE_UNIT;
+    obj["fireSpread"] = sl[0].toInt();
+    obj["secWpn"] = sl[1].toInt();
+    obj["secWpnDist"] = sl[2].toInt();
+    obj["fireVelocity"] = sl[3].toInt() / DISTANCE_UNIT;
 
     // last lines
     ts.readLine();
-    obj["boss_fire_sfx"] = ts.readLine();
-    obj["boss_yell_sfx"] = ts.readLine();
+    obj["bossFireSfx"] = ts.readLine();
+    obj["bossYellSfx"] = ts.readLine();
 
 
 

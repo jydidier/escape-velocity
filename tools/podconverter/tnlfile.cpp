@@ -60,8 +60,8 @@ TnlFile::TnlFile(PodArchive &arch, QString path) : PodFile(arch, path)
             polygons << ts.readLine().toInt();
         }
 
-        light["flicker_type"] = ts.readLine().toInt();
-        light["flicker_strength"] = ts.readLine().toFloat() / LIGHT_UNIT;
+        light["flickerType"] = ts.readLine().toInt();
+        light["flickerStrength"] = ts.readLine().toFloat() / LIGHT_UNIT;
         light["ambient"] = ts.readLine().toFloat() / LIGHT_UNIT;
 
         segment["start"] = start;

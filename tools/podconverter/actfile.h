@@ -14,6 +14,8 @@ public:
 
     QVector<QRgb> getPalette() { return palette; }
 
+    void shiftColors(int shift);
+
 private:
     QVector<QRgb> palette;
 

@@ -85,9 +85,9 @@ void NavFile::readTunnelExit(QTextStream &ts, QJsonObject &)
 
 void NavFile::readBoss(QTextStream &ts, QJsonObject &obj)
 {
-    obj["boss_index"] = ts.readLine().toInt();
+    obj["bossIndex"] = ts.readLine().toInt();
     QString musicFile = ts.readLine();
-    obj["music_file"] = musicFile;
+    obj["musicFile"] = musicFile;
     deps << musicFile;
     ts.readLine(); ts.readLine();
 

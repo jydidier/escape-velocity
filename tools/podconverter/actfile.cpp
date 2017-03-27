@@ -15,3 +15,18 @@ ActFile::ActFile(PodArchive &arch, QString path) : PodFile(arch, path), palette(
         }
     }
 }
+
+void ActFile::shiftColors(int shift)
+{
+    int absShift = (shift>0)?shift:-shift;
+
+    for(int i=0; i < absShift; i++) {
+        if (shift > 0) {
+            palette.prepend(qRgb(0,0,0));
+            palette.takeLast();
+        } else {
+            palette.append(qRgb(0,0,0));
+            palette.takeFirst();
+        }
+    }
+}

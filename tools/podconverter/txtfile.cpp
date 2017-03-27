@@ -24,7 +24,7 @@ TxtFile::TxtFile(PodArchive &arch, QString path) : PodFile(arch,path)
         briefingLines << line;
         line = ts.readLine();
     }
-    briefing["briefing"] = briefingLines;
+    briefing["mission"] = briefingLines;
 }
 
 QByteArray TxtFile::convert()

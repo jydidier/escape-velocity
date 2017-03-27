@@ -29,7 +29,7 @@ QStringList PodFile::getAllDependencies()
     while (!stack.empty()) {
         QString fn = stack.takeFirst();
         explored << fn;
-        QStringList lst = archive.findFiles("*"+fn);
+        QStringList lst = archive.findFiles("*\\"+fn);
         if(! lst.empty()) {
             base << lst[0];
             if (!lst[0].endsWith("LVL")) {

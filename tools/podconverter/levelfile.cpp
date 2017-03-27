@@ -41,7 +41,7 @@ LevelFile::LevelFile(PodArchive &arch, QString path) :
     }
     line = ts.readLine();
     if (type == 4) {
-        level["texture_placement"] = line;
+        level["texturePlacement"] = line;
         deps << line;
     }
 
@@ -57,11 +57,12 @@ LevelFile::LevelFile(PodArchive &arch, QString path) :
     deps << line;
     level["animation"] = line = ts.readLine();
     deps << line;
-    level["tunnel_definition"] = line = ts.readLine();
+    level["tunnelDefinition"] = line = ts.readLine();
     deps << line;
-    level["cloud_texture"] = line = ts.readLine();
+    level["clouds"] = line = ts.readLine();
     deps << line;
-    level["background_palette"] = line = ts.readLine();
+    //level["backgroundPalette"] =
+    backgroundPaletteFile = line = ts.readLine();
     deps << line;
     level["placement"] = line = ts.readLine();
     deps << line;
@@ -79,19 +80,19 @@ LevelFile::LevelFile(PodArchive &arch, QString path) :
     ts.readLine();
 
    sl = ts.readLine().split(',');
-    level["light_direction"] = (QJsonArray()
+    level["lightDirection"] = (QJsonArray()
                                 << sl[0].toFloat() / NORMAL_UNIT
                                 << sl[1].toFloat() / NORMAL_UNIT
                                 << sl[2].toFloat() / NORMAL_UNIT
                );
-    level["ambient_light"] = ts.readLine().toFloat() / LIGHT_UNIT;
+    level["ambientLight"] = ts.readLine().toFloat() / LIGHT_UNIT;
     sl = ts.readLine().split(',');
-    level["chamber_light_direction"] = (QJsonArray()
+    level["chamberLightDirection"] = (QJsonArray()
                                         << sl[0].toFloat() / NORMAL_UNIT
                                         << sl[1].toFloat() / NORMAL_UNIT
                                         << sl[2].toFloat() / NORMAL_UNIT
                 );
-    level["chamber_ambient_light"] = ts.readLine().toFloat() / LIGHT_UNIT;
+    level["chamberAmbientLight"] = ts.readLine().toFloat() / LIGHT_UNIT;
 
 
 
@@ -115,40 +116,40 @@ void LevelFile::exportLevel(QString dir)
     // first, we will finalize level file
 
     // let's do briefing
-    foundFiles = archive.findFiles("*"+level["briefing"].toString());
+    foundFiles = archive.findFiles("*\\"+level["briefing"].toString());
     TxtFile txtf(archive, foundFiles[0]);
     level["briefing"] = txtf.toJson();
     allDeps.removeAll(foundFiles[0]);
 
-    foundFiles = archive.findFiles("*"+level["textures"].toString());
+    foundFiles = archive.findFiles("*\\"+level["textures"].toString());
     TexFile texf(archive, foundFiles[0]);
     level["textures"] = texf.toJson();
     allDeps.removeAll(foundFiles[0]);
 
-    foundFiles = archive.findFiles("*"+level["powerups"].toString());
+    foundFiles = archive.findFiles("*\\"+level["powerups"].toString());
     PupFile pupf(archive, foundFiles[0]);
     level["powerups"] = pupf.toJson();
     allDeps.removeAll(foundFiles[0]);
 
-    foundFiles = archive.findFiles("*"+level["tunnel_definition"].toString());
+    foundFiles = archive.findFiles("*\\"+level["tunnelDefinition"].toString());
     TdfFile tdff(archive, foundFiles[0]);
-    level["tunnel_definition"] = tdff.toJson();
+    level["tunnelDefinition"] = tdff.toJson();
     allDeps.removeAll(foundFiles[0]);
 
-    foundFiles = archive.findFiles("*"+level["placement"].toString());
+    foundFiles = archive.findFiles("*\\"+level["placement"].toString());
     DefFile deff(archive, foundFiles[0]);
     level["placement"] = deff.toJson();
     allDeps.removeAll(foundFiles[0]);
 
-    if (!level["navigation"].isUndefined()) {
-        foundFiles = archive.findFiles("*"+level["navigation"].toString());
+    if (level.contains("navigation")) {
+        foundFiles = archive.findFiles("*\\"+level["navigation"].toString());
         NavFile navf(archive, foundFiles[0]);
         level["navigation"] = navf.toJson();
         allDeps.removeAll(foundFiles[0]);
     }
 
-    if (!level["tunnel"].isUndefined()) {
-        foundFiles = archive.findFiles("*"+level["tunnel"].toString());
+    if (level.contains("tunnel")) {
+        foundFiles = archive.findFiles("*\\"+level["tunnel"].toString());
         TnlFile tnlf(archive, foundFiles[0]);
         level["tunnel"] = tnlf.toJson();
         allDeps.removeAll(foundFiles[0]);
@@ -166,16 +167,28 @@ void LevelFile::exportLevel(QString dir)
 
     //std::cout << qPrintable(allDeps.join(',')) << std::endl;
     // paletteFile
-    ActFile af(archive, archive.findFiles("*"+paletteFile)[0]);
+    ActFile af(archive, archive.findFiles("*\\"+paletteFile)[0]);
+    ActFile afc(archive, archive.findFiles("*\\"+ backgroundPaletteFile)[0]);
+    afc.shiftColors(48);
+
+    QString cloudString = archive.findFiles("*\\"+level["clouds"].toString())[0].replace('\\',QDir::separator());
 
     for(QString fn : allDeps) {
+        //std::cout << "file " << qPrintable(fn) << std::endl;
+
         if (fn.endsWith("RAW")) {
             // here we will extract raw files
             // we shall use palette for this.
             RawFile rf(archive, fn);
             QFileInfo firaw(dir + QDir::separator() + fn.replace('\\', QDir::separator()) + ".png");
             QDir::root().mkpath(firaw.absolutePath());
-            rf.setPalette(af.getPalette());
+
+
+            if (cloudString == fn) {
+                rf.setPalette(afc.getPalette());
+            } else {
+                rf.setPalette(af.getPalette());
+            }
             rf.getImage().save(firaw.absoluteFilePath());
         } else {
             // we will ignore level files
@@ -188,8 +201,8 @@ void LevelFile::exportLevel(QString dir)
 
     }
 
-    if(! level["heightmap"].isUndefined()) {
-        QString fn = archive.findFiles("*"+level["heightmap"].toString())[0];
+    if(level.contains("heightmap")) {
+        QString fn = archive.findFiles("*\\"+level["heightmap"].toString())[0];
         QFileInfo fifile(dir + QDir::separator() + fn.replace('\\', QDir::separator()) );
         QDir::root().mkpath(fifile.absolutePath());
         archive.extractFile(fn, fifile.absoluteFilePath());
