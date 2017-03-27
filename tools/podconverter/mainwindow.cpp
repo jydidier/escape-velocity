@@ -169,8 +169,8 @@ void MainWindow::exportLevel()
     QFileInfo fi(data);
     LevelFile* lf = dynamic_cast<LevelFile*>(PodFile::load(pod, entry));
 
-    QString fn = QFileDialog::getSaveFileName(this,
-            QString("Please select a file to save level"),data+".json", QString("Level file (*.json)"));
+    QString fn = QFileDialog::getExistingDirectory(this,
+            QString("Please select a directory to save level"));
     if (!fn.isEmpty()) {
         lf->exportLevel(fn);
     }

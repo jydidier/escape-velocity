@@ -20,6 +20,7 @@ private:
     QStringList deps;
     QString paletteFile ;
     QJsonObject level;
+    QString filePath;
 
     static int fileTypeId;
 

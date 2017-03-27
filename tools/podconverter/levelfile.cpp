@@ -12,14 +12,20 @@
 #include <deffile.h>
 #include <navfile.h>
 #include <tnlfile.h>
+#include <rawfile.h>
+#include <actfile.h>
+#include <QDir>
 
 int LevelFile::fileTypeId = PodFile::registerLoader("LVL", fileLoader<LevelFile>);
 
-LevelFile::LevelFile(PodArchive &arch, QString path) : PodFile(arch, path)
+LevelFile::LevelFile(PodArchive &arch, QString path) :
+    PodFile(arch, path), filePath(path)
 {
     QTextStream ts(data, QIODevice::ReadOnly);
     QStringList sl;
     QString line;
+
+    filePath.replace('\\', QDir::separator());
 
     int type = ts.readLine().toInt();
     level["type"] = type;
@@ -148,27 +154,45 @@ void LevelFile::exportLevel(QString dir)
         allDeps.removeAll(foundFiles[0]);
     }
 
-    QFile file(dir);
+    QFileInfo fi(dir + QDir::separator() + filePath + ".json");
+    QDir::root().mkpath(fi.absolutePath());
+
+    QFile file(fi.absoluteFilePath());
     if (file.open(QFile::WriteOnly)) {
         QJsonDocument doc(level);
         file.write(doc.toJson());
         file.close();
     }
 
-    std::cout << qPrintable(allDeps.join(',')) << std::endl;
+    //std::cout << qPrintable(allDeps.join(',')) << std::endl;
+    // paletteFile
+    ActFile af(archive, archive.findFiles("*"+paletteFile)[0]);
 
     for(QString fn : allDeps) {
         if (fn.endsWith("RAW")) {
             // here we will extract raw files
             // we shall use palette for this.
-
+            RawFile rf(archive, fn);
+            QFileInfo firaw(dir + QDir::separator() + fn.replace('\\', QDir::separator()) + ".png");
+            QDir::root().mkpath(firaw.absolutePath());
+            rf.setPalette(af.getPalette());
+            rf.getImage().save(firaw.absoluteFilePath());
         } else {
             // we will ignore level files
             if (!fn.endsWith("LVL")) {
-
+                QFileInfo fifile(dir + QDir::separator() + fn.replace('\\', QDir::separator()) );
+                QDir::root().mkpath(fifile.absolutePath());
+                archive.extractFile(fn, fifile.absoluteFilePath());
             }
         }
 
+    }
+
+    if(! level["heightmap"].isUndefined()) {
+        QString fn = archive.findFiles("*"+level["heightmap"].toString())[0];
+        QFileInfo fifile(dir + QDir::separator() + fn.replace('\\', QDir::separator()) );
+        QDir::root().mkpath(fifile.absolutePath());
+        archive.extractFile(fn, fifile.absoluteFilePath());
     }
 
 }
